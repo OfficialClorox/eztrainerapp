@@ -249,7 +249,22 @@
                         <button class="btn btn-success" onclick="exportData()">📊 Export</button>
                         <button class="btn btn-secondary" onclick="addMealEntry()">➕ Add Entry</button>
                         <button class="btn btn-primary" onclick="openMealOptionsModal()">🍽️ Select Meal</button>
-                        <button class="btn btn-warning" onclick="adjustTargets()">🎯 Goals</button>
+                        <button class="btn btn-warning" onclick="adjustTargets()">🎯 Edit Goals</button>
+                        <button class="btn btn-small" onclick="autoDistributeMealGoals()" title="Auto-distribute goals across meals">🔄 Auto-Distribute</button>
+                    </div>
+                    
+                    <!-- Trainer Quick Access -->
+                    <div style="margin-top: 15px; padding: 12px; background: rgba(255, 152, 0, 0.1); border-radius: var(--radius); border-left: 4px solid var(--secondary);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="color: var(--secondary); margin: 0 0 4px 0; font-size: 14px;">👨‍💼 Trainer Controls</h4>
+                                <p style="color: var(--text-secondary); font-size: 12px; margin: 0;">All macro goals are fully editable. Use Ctrl+G for quick access.</p>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary btn-small" onclick="getGoalAdjustmentSuggestions().length > 0 ? showNotification('📈 Goal adjustments suggested based on recent performance', 'success') : showNotification('👍 Current goals look good based on recent performance', 'success')">📈 Analyze</button>
+                                <button class="btn btn-warning btn-small" onclick="openMacroGoalsModal()">⚙️ Goals</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
