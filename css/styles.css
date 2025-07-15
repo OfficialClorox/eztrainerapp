@@ -1142,46 +1142,169 @@ body {
     font-size: 12px;
 }
 
+/* Enhanced Goal Management Styles */
+.meal-goal-card {
+    background: rgba(26, 26, 26, 0.6);
+    padding: 15px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.meal-goal-card:hover {
+    border-color: rgba(0, 188, 212, 0.3);
+}
+
+.meal-goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.meal-percentage {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: normal;
+}
+
+.reset-meal-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.reset-meal-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+}
+
+.goal-info, .meal-goal-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+.current-value {
+    color: var(--text-secondary);
+}
+
+.change-indicator {
+    font-weight: 600;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: none;
+}
+
+.change-indicator.positive {
+    background: rgba(76, 175, 80, 0.2);
+    color: var(--success);
+}
+
+.change-indicator.negative {
+    background: rgba(244, 67, 54, 0.2);
+    color: var(--danger);
+}
+
+/* Enhanced form inputs for goal management */
+.form-group input[type="number"] {
+    transition: var(--transition);
+}
+
+.form-group input[type="number"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+    transform: scale(1.02);
+}
+
+/* Goal editing visual enhancements */
+.macro-goals-modal .form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.macro-goals-modal .form-group input {
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Preset buttons styling */
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Enhanced progress indicators */
+.adherence-progress {
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}
+
+.adherence-progress .progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.adherence-progress .progress-fill {
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+/* Enhanced meal goal cards for better visual hierarchy */
+.meal-goal-card[data-meal="breakfast"] {
+    border-left: 3px solid #FFC107;
+}
+
+.meal-goal-card[data-meal="lunch"] {
+    border-left: 3px solid #FF9800;
+}
+
+.meal-goal-card[data-meal="dinner"] {
+    border-left: 3px solid #F44336;
+}
+
+.meal-goal-card[data-meal="snack"] {
+    border-left: 3px solid #4CAF50;
+}
+
+/* Responsive adjustments for goal management */
 @media (max-width: 768px) {
-    .container { padding: 15px; }
-    .header { 
-        padding: 20px; 
-        flex-direction: column; 
-        gap: 15px;
+    .macro-goals-modal .modal {
+        max-width: 95%;
+        padding: 20px;
     }
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .quick-stats { grid-template-columns: repeat(2, 1fr); }
-    .macro-summary { grid-template-columns: repeat(2, 1fr); }
-    .calendar-grid { gap: 4px; }
-    .calendar-day { min-height: 80px; padding: 4px; }
-    .day-meals { font-size: 8px; }
-    .tabs { flex-direction: column; }
-    .tab { text-align: center; }
-    .modal { width: 95%; padding: 20px; }
-    .calendar-actions { justify-content: center; }
-    .calendar-header { flex-direction: column; }
-    .planning-sidebar { width: 100%; right: -100%; }
-    .calendar-container.planning-mode { margin-right: 0; }
     
-    /* Mobile serving controls */
-    .serving-controls {
+    .meal-goal-header {
         flex-direction: column;
-        gap: 8px;
+        align-items: flex-start;
+        gap: 5px;
     }
     
-    .serving-selector {
-        width: 100%;
+    .goal-info, .meal-goal-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
     }
     
-    .servings-number {
-        min-width: 60px;
-    }
-    
-    .macro-preview-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .progress-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .change-indicator {
+        align-self: flex-end;
     }
 }
