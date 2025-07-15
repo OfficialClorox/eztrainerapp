@@ -1,4 +1,4 @@
-// Food Database Functions
+// Food Database Functions with Enhanced Serving Controls
 function populateFoodList() {
     const foodList = document.getElementById('food-list');
     if (!foodList) return;
@@ -6,12 +6,15 @@ function populateFoodList() {
     const foods = appState.foodDatabase;
     
     foodList.innerHTML = foods.map(food => `
-        <div class="food-item" onclick="addFoodToPlan('${food.name}', ${food.calories}, ${food.protein}, ${food.carbs}, ${food.fat})">
-            <div class="food-info">
-                <div class="food-name">${food.name}</div>
-                <div class="food-macros">${food.calories} cal • ${food.protein}g P • ${food.carbs}g C • ${food.fat}g F</div>
+        <div class="food-item-container" data-food='${JSON.stringify(food)}'>
+            <div class="food-item" onclick="openFoodServingModal('${food.name}', ${food.calories}, ${food.protein}, ${food.carbs}, ${food.fat}, 'meal-builder')">
+                <div class="food-info">
+                    <div class="food-name">${food.name}</div>
+                    <div class="food-macros">${food.calories} cal • ${food.protein}g P • ${food.carbs}g C • ${food.fat}g F</div>
+                    <div class="food-serving-note">Per 100g • Click to customize serving</div>
+                </div>
+                <button class="add-food-btn">Customize & Add</button>
             </div>
-            <button class="add-food-btn">Add</button>
         </div>
     `).join('');
 }
@@ -35,12 +38,15 @@ function searchFoods(query) {
     if (!foodList) return;
     
     foodList.innerHTML = filteredFoods.map(food => `
-        <div class="food-item" onclick="addFoodToPlan('${food.name}', ${food.calories}, ${food.protein}, ${food.carbs}, ${food.fat})">
-            <div class="food-info">
-                <div class="food-name">${food.name}</div>
-                <div class="food-macros">${food.calories} cal • ${food.protein}g P • ${food.carbs}g C • ${food.fat}g F</div>
+        <div class="food-item-container" data-food='${JSON.stringify(food)}'>
+            <div class="food-item" onclick="openFoodServingModal('${food.name}', ${food.calories}, ${food.protein}, ${food.carbs}, ${food.fat}, 'meal-builder')">
+                <div class="food-info">
+                    <div class="food-name">${food.name}</div>
+                    <div class="food-macros">${food.calories} cal • ${food.protein}g P • ${food.carbs}g C • ${food.fat}g F</div>
+                    <div class="food-serving-note">Per 100g • Click to customize serving</div>
+                </div>
+                <button class="add-food-btn">Customize & Add</button>
             </div>
-            <button class="add-food-btn">Add</button>
         </div>
     `).join('');
 }
@@ -51,6 +57,187 @@ function filterFoods() {
     searchFoods(query);
 }
 
+// Enhanced Food Serving Modal
+function openFoodServingModal(name, baseCals, baseProtein, baseCarbs, baseFat, targetContext) {
+    // Store the target context to know where to add the food
+    appState.currentFoodTarget = targetContext;
+    
+    // Create modal HTML
+    const modalHTML = `
+        <div class="modal-overlay" id="food-serving-modal" style="display: flex;">
+            <div class="modal" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2 class="modal-title">🍽️ Customize Serving - ${name}</h2>
+                    <button class="close-btn" onclick="closeFoodServingModal()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="serving-controls">
+                        <div class="form-group">
+                            <label>Serving Size</label>
+                            <div class="serving-size-input">
+                                <input type="number" id="serving-amount" value="100" min="1" step="1" oninput="updateFoodMacros()">
+                                <select id="serving-unit" onchange="updateFoodMacros()">
+                                    <option value="g">grams</option>
+                                    <option value="oz">ounces</option>
+                                    <option value="cup">cups</option>
+                                    <option value="tbsp">tablespoons</option>
+                                    <option value="tsp">teaspoons</option>
+                                    <option value="piece">pieces</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Number of Servings</label>
+                            <input type="number" id="serving-count" value="1" min="0.1" step="0.1" oninput="updateFoodMacros()">
+                        </div>
+                        
+                        <div class="macro-preview">
+                            <h4>Nutrition Information:</h4>
+                            <div class="macro-display">
+                                <div class="macro-item">
+                                    <span class="macro-label">Calories:</span>
+                                    <span class="macro-value" id="preview-calories">${baseCals}</span>
+                                </div>
+                                <div class="macro-item">
+                                    <span class="macro-label">Protein:</span>
+                                    <span class="macro-value" id="preview-protein">${baseProtein}g</span>
+                                </div>
+                                <div class="macro-item">
+                                    <span class="macro-label">Carbs:</span>
+                                    <span class="macro-value" id="preview-carbs">${baseCarbs}g</span>
+                                </div>
+                                <div class="macro-item">
+                                    <span class="macro-label">Fat:</span>
+                                    <span class="macro-value" id="preview-fat">${baseFat}g</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="serving-summary">
+                            <p><strong>Total:</strong> <span id="serving-summary-text">100g × 1 serving</span></p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="closeFoodServingModal()">Cancel</button>
+                        <button class="btn btn-success" onclick="addCustomizedFood('${name}', ${baseCals}, ${baseProtein}, ${baseCarbs}, ${baseFat})">Add to Meal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('food-serving-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Store base values for calculations
+    appState.currentFoodBase = { name, baseCals, baseProtein, baseCarbs, baseFat };
+    
+    // Initial calculation
+    updateFoodMacros();
+}
+
+function closeFoodServingModal() {
+    const modal = document.getElementById('food-serving-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function updateFoodMacros() {
+    if (!appState.currentFoodBase) return;
+    
+    const amount = parseFloat(document.getElementById('serving-amount').value) || 0;
+    const servingCount = parseFloat(document.getElementById('serving-count').value) || 0;
+    const unit = document.getElementById('serving-unit').value;
+    
+    // Convert units to grams for calculation (simplified conversion)
+    let gramsMultiplier = 1;
+    switch(unit) {
+        case 'oz': gramsMultiplier = 28.35; break;
+        case 'cup': gramsMultiplier = 240; break; // Approximate for liquids
+        case 'tbsp': gramsMultiplier = 15; break;
+        case 'tsp': gramsMultiplier = 5; break;
+        case 'piece': gramsMultiplier = 1; break; // Will need food-specific values
+        default: gramsMultiplier = 1; // grams
+    }
+    
+    const totalGrams = amount * gramsMultiplier * servingCount;
+    const multiplier = totalGrams / 100; // Base values are per 100g
+    
+    const { baseCals, baseProtein, baseCarbs, baseFat } = appState.currentFoodBase;
+    
+    // Calculate adjusted values
+    const calories = Math.round(baseCals * multiplier);
+    const protein = Math.round(baseProtein * multiplier * 10) / 10;
+    const carbs = Math.round(baseCarbs * multiplier * 10) / 10;
+    const fat = Math.round(baseFat * multiplier * 10) / 10;
+    
+    // Update display
+    document.getElementById('preview-calories').textContent = calories;
+    document.getElementById('preview-protein').textContent = protein + 'g';
+    document.getElementById('preview-carbs').textContent = carbs + 'g';
+    document.getElementById('preview-fat').textContent = fat + 'g';
+    
+    // Update summary
+    const unitName = unit === 'g' ? 'g' : unit;
+    document.getElementById('serving-summary-text').textContent = 
+        `${amount}${unitName} × ${servingCount} serving${servingCount !== 1 ? 's' : ''}`;
+}
+
+function addCustomizedFood(name, baseCals, baseProtein, baseCarbs, baseFat) {
+    const amount = parseFloat(document.getElementById('serving-amount').value) || 0;
+    const servingCount = parseFloat(document.getElementById('serving-count').value) || 0;
+    const unit = document.getElementById('serving-unit').value;
+    
+    // Convert and calculate final values
+    let gramsMultiplier = 1;
+    switch(unit) {
+        case 'oz': gramsMultiplier = 28.35; break;
+        case 'cup': gramsMultiplier = 240; break;
+        case 'tbsp': gramsMultiplier = 15; break;
+        case 'tsp': gramsMultiplier = 5; break;
+        case 'piece': gramsMultiplier = 1; break;
+        default: gramsMultiplier = 1;
+    }
+    
+    const totalGrams = amount * gramsMultiplier * servingCount;
+    const multiplier = totalGrams / 100;
+    
+    const calories = baseCals * multiplier;
+    const protein = baseProtein * multiplier;
+    const carbs = baseCarbs * multiplier;
+    const fat = baseFat * multiplier;
+    
+    // Create display name with serving info
+    const unitDisplay = unit === 'g' ? 'g' : unit;
+    const servingText = servingCount === 1 ? 
+        `${amount}${unitDisplay}` : 
+        `${amount}${unitDisplay} × ${servingCount}`;
+    const displayName = `${name} (${servingText})`;
+    
+    // Add to appropriate target
+    const targetContext = appState.currentFoodTarget;
+    
+    if (targetContext === 'meal-builder') {
+        addFoodToPlan(displayName, calories, protein, carbs, fat);
+    } else if (targetContext === 'temp-meal') {
+        addFoodToTempMeal(displayName, calories, protein, carbs, fat);
+    } else if (targetContext === 'meal-option') {
+        addFoodToMealOption(displayName, calories, protein, carbs, fat);
+    }
+    
+    closeFoodServingModal();
+}
+
+// Keep existing functions but update them to use the new modal system
 function addFoodToPlan(name, calories, protein, carbs, fat) {
     appState.currentMeal.push({ name, calories, protein, carbs, fat });
     updateMealBuilder();
@@ -77,7 +264,7 @@ function updateMealBuilder() {
         <div style="margin-bottom: 15px;">
             ${appState.currentMeal.map((food, index) => `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border);">
-                    <span style="color: var(--text-primary);">${food.name}</span>
+                    <span style="color: var(--text-primary); font-size: 13px;">${food.name}</span>
                     <button onclick="removeFromMealBuilder(${index})" style="background: none; border: none; color: var(--danger); cursor: pointer;">×</button>
                 </div>
             `).join('')}
@@ -111,7 +298,7 @@ function saveMealPlan() {
     clearMealBuilder();
 }
 
-// Meal Options Functions
+// Meal Options Functions (updated for serving sizes)
 function openMealOptionsModal() {
     const modal = document.getElementById('meal-options-modal');
     if (modal) {
@@ -136,8 +323,8 @@ function updateMealOptionsList() {
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                 <h4 style="color: var(--text-primary); margin: 0; font-size: 16px;">${option.name}</h4>
                 <div style="text-align: right;">
-                    <div style="color: var(--primary); font-weight: 600; font-size: 14px;">${option.calories} cal</div>
-                    <div style="color: var(--text-secondary); font-size: 12px;">${option.protein}g P • ${option.carbs}g C • ${option.fat}g F</div>
+                    <div style="color: var(--primary); font-weight: 600; font-size: 14px;">${Math.round(option.calories)} cal</div>
+                    <div style="color: var(--text-secondary); font-size: 12px;">${Math.round(option.protein)}g P • ${Math.round(option.carbs)}g C • ${Math.round(option.fat)}g F</div>
                 </div>
             </div>
             <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 10px;">
@@ -166,7 +353,7 @@ function selectMealOption(mealType, optionIndex) {
     // and update the UI accordingly
 }
 
-// Manage Meal Options Functions
+// Continue with existing functions...
 function openManageMealOptionsModal() {
     const modal = document.getElementById('manage-meal-options-modal');
     if (modal) {
@@ -188,7 +375,7 @@ function updateManageMealOptionsList() {
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                 <div style="flex: 1;">
                     <h4 style="color: var(--text-primary); margin: 0 0 5px 0; font-size: 14px;">${option.name}</h4>
-                    <div style="color: var(--text-secondary); font-size: 12px;">${option.calories} cal • ${option.protein}g P • ${option.carbs}g C • ${option.fat}g F</div>
+                    <div style="color: var(--text-secondary); font-size: 12px;">${Math.round(option.calories)} cal • ${Math.round(option.protein)}g P • ${Math.round(option.carbs)}g C • ${Math.round(option.fat)}g F</div>
                 </div>
                 <div style="display: flex; gap: 5px;">
                     <button class="btn btn-secondary btn-small" onclick="editMealOption('${mealType}', ${index})" style="font-size: 11px; padding: 4px 8px;">Edit</button>
@@ -225,7 +412,7 @@ function importMealOptions() {
     showNotification('📥 Meal options import feature coming soon!', 'warning');
 }
 
-// Create Meal Option Functions
+// Create Meal Option Functions (updated for serving sizes)
 function openCreateMealOptionModal() {
     const modal = document.getElementById('create-meal-option-modal');
     if (modal) {
@@ -243,12 +430,13 @@ function populateMealOptionFoodList() {
     const foods = appState.foodDatabase;
     
     foodList.innerHTML = foods.map(food => `
-        <div class="food-item" onclick="addFoodToMealOption('${food.name}', ${food.calories}, ${food.protein}, ${food.carbs}, ${food.fat})">
+        <div class="food-item" onclick="openFoodServingModal('${food.name}', ${food.calories}, ${food.protein}, ${food.carbs}, ${food.fat}, 'meal-option')">
             <div class="food-info">
                 <div class="food-name">${food.name}</div>
                 <div class="food-macros">${food.calories} cal • ${food.protein}g P • ${food.carbs}g C • ${food.fat}g F</div>
+                <div class="food-serving-note">Per 100g • Click to customize</div>
             </div>
-            <button class="add-food-btn">Add</button>
+            <button class="add-food-btn">Customize & Add</button>
         </div>
     `).join('');
 }
@@ -272,12 +460,13 @@ function searchMealOptionFoods(query) {
     if (!foodList) return;
     
     foodList.innerHTML = filteredFoods.map(food => `
-        <div class="food-item" onclick="addFoodToMealOption('${food.name}', ${food.calories}, ${food.protein}, ${food.carbs}, ${food.fat})">
+        <div class="food-item" onclick="openFoodServingModal('${food.name}', ${food.calories}, ${food.protein}, ${food.carbs}, ${food.fat}, 'meal-option')">
             <div class="food-info">
                 <div class="food-name">${food.name}</div>
                 <div class="food-macros">${food.calories} cal • ${food.protein}g P • ${food.carbs}g C • ${food.fat}g F</div>
+                <div class="food-serving-note">Per 100g • Click to customize</div>
             </div>
-            <button class="add-food-btn">Add</button>
+            <button class="add-food-btn">Customize & Add</button>
         </div>
     `).join('');
 }
@@ -385,7 +574,7 @@ function saveMealOption() {
     }
 }
 
-// Recipe Functions
+// Recipe Functions (existing code continues...)
 function addIngredient() {
     const ingredientInput = document.getElementById('ingredient-search');
     const amountInput = document.getElementById('ingredient-amount');
