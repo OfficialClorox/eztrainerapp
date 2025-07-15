@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EZ Trainer - Client Meal Management</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">💪</div>
+                <span>EZ Trainer</span>
+            </div>
+            
+            <div class="client-selector">
+                <div class="client-avatar">SM</div>
+                <div class="client-info">
+                    <h3>Sarah Mitchell</h3>
+                    <p>Weight Loss • 3 months active</p>
+                </div>
+                <select style="padding: 8px 12px; background: rgba(26, 26, 26, 0.8); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
+                    <option>Sarah Mitchell</option>
+                    <option>John Davis</option>
+                    <option>Emily Chen</option>
+                    <option>Michael Torres</option>
+                </select>
+            </div>
+        </header>
+        
+        <!-- Tabs -->
+        <nav class="tabs">
+            <button class="tab active" onclick="showTab('tracking')">📊 Tracking & Progress</button>
+            <button class="tab" onclick="showTab('calendar')">📅 Calendar & Planning</button>
+        </nav>
+        
+        <!-- Tracking & Progress Tab -->
+        <div id="tracking" class="tab-content active">
+            <div class="grid grid-2">
+                <!-- Daily Meal Tracking -->
+                <div class="card">
+                    <h3>📊 Daily Meal Tracking</h3>
+                    
+                    <!-- Day Navigation -->
+                    <div class="day-navigation">
+                        <button class="btn btn-secondary btn-small" onclick="previousDay()">‹ Previous</button>
+                        <div class="day-title" id="current-day-title">July 12, 2025</div>
+                        <button class="btn btn-secondary btn-small" onclick="nextDay()">Next ›</button>
+                    </div>
+                    
+                    <!-- Macro Summary -->
+                    <div class="macro-summary">
+                        <div class="macro-card">
+                            <div class="macro-value" id="day-calories">1990</div>
+                            <div class="macro-target">/ 2281 cal</div>
+                            <div class="macro-difference negative">-291</div>
+                        </div>
+                        <div class="macro-card">
+                            <div class="macro-value" id="day-protein">154g</div>
+                            <div class="macro-target">/ 139g</div>
+                            <div class="macro-difference positive">+15g</div>
+                        </div>
+                        <div class="macro-card">
+                            <div class="macro-value" id="day-carbs">163g</div>
+                            <div class="macro-target">/ 304g</div>
+                            <div class="macro-difference negative">-141g</div>
+                        </div>
+                        <div class="macro-card">
+                            <div class="macro-value" id="day-fat">58g</div>
+                            <div class="macro-target">/ 65g</div>
+                            <div class="macro-difference negative">-7g</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Meal Details (Collapsible) -->
+                    <div class="meals-details">
+                        <div class="meal-header" onclick="toggleMealDetails('breakfast')">
+                            <h4>🌅 Breakfast - 350 cal</h4>
+                            <span class="dropdown-arrow" id="breakfast-arrow">▼</span>
+                        </div>
+                        <div class="meal-content" id="breakfast-content">
+                            <div class="meal-items">
+                                <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
+                                    <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=60&h=60&fit=crop" 
+                                         style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 2px solid var(--primary);" 
+                                         alt="Food photo">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text-primary);">3 Eggs</span>
+                                            <span style="color: var(--text-secondary);">210 cal | 18g P | 1g C | 15g F</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client</div>
+                                    </div>
+                                </div>
+                                <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 60px; height: 60px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border);">
+                                        <span style="font-size: 24px;">🍞</span>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text-primary);">2 slices whole grain bread</span>
+                                            <span style="color: var(--text-secondary);">140 cal | 6g P | 24g C | 2g F</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="meal-header" onclick="toggleMealDetails('snack1')">
+                            <h4>🥤 Morning Snack - 310 cal</h4>
+                            <span class="dropdown-arrow" id="snack1-arrow">▼</span>
+                        </div>
+                        <div class="meal-content" id="snack1-content">
+                            <div class="meal-items">
+                                <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
+                                    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=60&h=60&fit=crop" 
+                                         style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 2px solid var(--primary);" 
+                                         alt="Food photo">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text-primary);">Protein shake</span>
+                                            <span style="color: var(--text-secondary);">310 cal | 25g P | 38g C | 5g F</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="meal-header" onclick="toggleMealDetails('lunch')">
+                            <h4>☀️ Lunch - 530 cal</h4>
+                            <span class="dropdown-arrow" id="lunch-arrow">▼</span>
+                        </div>
+                        <div class="meal-content" id="lunch-content">
+                            <div class="meal-items">
+                                <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
+                                    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=60&h=60&fit=crop" 
+                                         style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 2px solid var(--primary);" 
+                                         alt="Food photo">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text-primary);">Grilled chicken</span>
+                                            <span style="color: var(--text-secondary);">300 cal | 40g P | 0g C | 7g F</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client</div>
+                                    </div>
+                                </div>
+                                <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 60px; height: 60px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border);">
+                                        <span style="font-size: 24px;">🍚</span>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text-primary);">Quinoa</span>
+                                            <span style="color: var(--text-secondary);">230 cal | 5g P | 40g C | 5g F</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="meal-header" onclick="toggleMealDetails('snack2')">
+                            <h4>🍎 Afternoon Snack - 150 cal</h4>
+                            <span class="dropdown-arrow" id="snack2-arrow">▼</span>
+                        </div>
+                        <div class="meal-content" id="snack2-content">
+                            <div class="meal-items">
+                                <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 60px; height: 60px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border);">
+                                        <span style="font-size: 24px;">🥛</span>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text-primary);">Greek yogurt</span>
+                                            <span style="color: var(--text-secondary);">150 cal | 15g P | 10g C | 4g F</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="meal-header" onclick="toggleMealDetails('dinner')">
+                            <h4>🌙 Dinner - 650 cal</h4>
+                            <span class="dropdown-arrow" id="dinner-arrow">▼</span>
+                        </div>
+                        <div class="meal-content" id="dinner-content">
+                            <div class="meal-items">
+                                <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
+                                    <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=60&h=60&fit=crop" 
+                                         style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 2px solid var(--primary);" 
+                                         alt="Food photo">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text-primary);">Salmon</span>
+                                            <span style="color: var(--text-secondary);">400 cal | 40g P | 0g C | 20g F</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client</div>
+                                    </div>
+                                </div>
+                                <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 60px; height: 60px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border);">
+                                        <span style="font-size: 24px;">🍠</span>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text-primary);">Sweet potatoes</span>
+                                            <span style="color: var(--text-secondary);">250 cal | 5g P | 50g C | 0g F</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 25px; display: flex; gap: 15px; flex-wrap: wrap;">
+                        <button class="btn btn-success" onclick="exportData()">📊 Export</button>
+                        <button class="btn btn-secondary" onclick="addMealEntry()">➕ Add Entry</button>
+                        <button class="btn btn-primary" onclick="openMealOptionsModal()">🍽️ Select Meal</button>
+                        <button class="btn btn-warning" onclick="adjustTargets()">🎯 Targets</button>
+                    </div>
+                </div>
+                
+                <!-- Progress Overview -->
+                <div class="card">
+                    <h3>📈 Progress Overview</h3>
+                    
+                    <div class="quick-stats" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 25px;">
+                        <div class="stat-card">
+                            <div class="stat-value">87%</div>
+                            <div class="stat-label">Goal Adherence</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">14</div>
+                            <div class="stat-label">Day Streak</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">-3.2 lbs</div>
+                            <div class="stat-label">Weight Change</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">28</div>
+                            <div class="stat-label">Days Tracked</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px;">
+                        <div style="text-align: center;">
+                            <div class="progress-ring">
+                                <svg>
+                                    <circle class="bg" cx="40" cy="40" r="30"></circle>
+                                    <circle class="fill" cx="40" cy="40" r="30" 
+                                            stroke="var(--success)" stroke-dasharray="188" stroke-dashoffset="28"></circle>
+                                </svg>
+                                <div class="progress-text">
+                                    <div class="progress-value">85%</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Adherence</div>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <div class="progress-ring">
+                                <svg>
+                                    <circle class="bg" cx="40" cy="40" r="30"></circle>
+                                    <circle class="fill" cx="40" cy="40" r="30" 
+                                            stroke="var(--primary)" stroke-dasharray="188" stroke-dashoffset="19"></circle>
+                                </svg>
+                                <div class="progress-text">
+                                    <div class="progress-value">90%</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Protein</div>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <div class="progress-ring">
+                                <svg>
+                                    <circle class="bg" cx="40" cy="40" r="30"></circle>
+                                    <circle class="fill" cx="40" cy="40" r="30" 
+                                            stroke="var(--warning)" stroke-dasharray="188" stroke-dashoffset="56"></circle>
+                                </svg>
+                                <div class="progress-text">
+                                    <div class="progress-value">70%</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Calories</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 15px; color: var(--text-primary);">📈 Weekly Trends</h4>
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px;">
+                        <div style="text-align: center;">
+                            <div style="background: var(--success); height: 40px; border-radius: 4px; margin-bottom: 8px;"></div>
+                            <div style="font-size: 10px; color: var(--text-muted);">M</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">95%</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="background: var(--success); height: 50px; border-radius: 4px; margin-bottom: 8px;"></div>
+                            <div style="font-size: 10px; color: var(--text-muted);">T</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">88%</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="background: var(--warning); height: 30px; border-radius: 4px; margin-bottom: 8px;"></div>
+                            <div style="font-size: 10px; color: var(--text-muted);">W</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">72%</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="background: var(--success); height: 55px; border-radius: 4px; margin-bottom: 8px;"></div>
+                            <div style="font-size: 10px; color: var(--text-muted);">T</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">92%</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="background: var(--success); height: 45px; border-radius: 4px; margin-bottom: 8px;"></div>
+                            <div style="font-size: 10px; color: var(--text-muted);">F</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">85%</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="background: var(--danger); height: 15px; border-radius: 4px; margin-bottom: 8px;"></div>
+                            <div style="font-size: 10px; color: var(--text-muted);">S</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">45%</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="background: var(--success); height: 40px; border-radius: 4px; margin-bottom: 8px;"></div>
+                            <div style="font-size: 10px; color: var(--text-muted);">S</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">82%</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(0, 188, 212, 0.1); padding: 15px; border-radius: var(--radius); border-left: 4px solid var(--primary);">
+                        <h4 style="color: var(--primary); margin-bottom: 8px; font-size: 14px;">📊 Coach Notes</h4>
+                        <p style="color: var(--text-primary); margin-bottom: 8px; font-size: 13px;">Sarah shows excellent consistency. Saturday's low adherence likely due to social events.</p>
+                        <p style="color: var(--text-secondary); font-size: 12px; margin: 0;"><strong>Action:</strong> Discuss weekend nutrition strategies.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calendar & Planning Tab -->
+        <div id="calendar" class="tab-content">
+            <div class="card">
+                <div class="calendar-container" id="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-nav">
+                            <button class="btn btn-secondary" onclick="previousMonth()">‹</button>
+                            <h3 style="margin: 0; font-size: 28px; color: var(--text-primary);">July 2025</h3>
+                            <button class="btn btn-secondary" onclick="nextMonth()">›</button>
+                        </div>
+                        <div class="calendar-actions">
+                            <button class="btn" onclick="openPlanningSidebar()">🍽️ Edit Plan</button>
+                            <button class="btn btn-secondary btn-small" onclick="copySelectedDays()" id="copy-btn" disabled>📋 Copy</button>
+                            <button class="btn btn-secondary btn-small" onclick="pasteToSelectedDays()" id="paste-btn" disabled>📄 Paste</button>
+                            <button class="btn btn-danger btn-small" onclick="clearSelectedDays()" id="clear-btn" disabled>🗑️ Clear</button>
+                            <button class="btn btn-success btn-small" onclick="saveCalendar()">💾 Save</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Selection Info -->
+                    <div id="selection-info" class="selection-info" style="display: none;">
+                        <h4>📋 Selection Info</h4>
+                        <p id="selection-text">No days selected</p>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Day Headers -->
+                        <div class="calendar-day-header">MON</div>
+                        <div class="calendar-day-header">TUE</div>
+                        <div class="calendar-day-header">WED</div>
+                        <div class="calendar-day-header">THU</div>
+                        <div class="calendar-day-header">FRI</div>
+                        <div class="calendar-day-header">SAT</div>
+                        <div class="calendar-day-header">SUN</div>
+                        
+                        <!-- Calendar days will be generated by JavaScript -->
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(0, 188, 212, 0.1); border-radius: var(--radius); border-left: 4px solid var(--primary);">
+                        <h4 style="color: var(--primary); margin-bottom: 8px;">💡 Calendar Guide</h4>
+                        <p style="color: var(--text-primary); font-size: 14px; margin: 0;">
+                            • <strong>Click & Drag:</strong> Select multiple days • <strong>Single-Click:</strong> Edit day's meals • <strong>Shift + Click:</strong> Select range • Use Copy/Paste for bulk operations
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planning Sidebar -->
+    <div class="planning-sidebar" id="planning-sidebar">
+        <div class="sidebar-header">
+            <h3 class="sidebar-title">🍽️ Meal Planning</h3>
+            <button class="close-sidebar" onclick="closePlanningSidebar()">×</button>
+        </div>
+        <div class="sidebar-content">
+            <!-- Food Database Section -->
+            <div class="sidebar-section">
+                <h4>🗄️ Food Database</h4>
+                <div class="search-filters">
+                    <input type="text" class="search-input" placeholder="Search foods..." id="food-search" oninput="searchFoods(this.value)">
+                    <select class="filter-select" id="food-category" onchange="filterFoods()">
+                        <option value="">All Categories</option>
+                        <option value="protein">Proteins</option>
+                        <option value="carbs">Carbohydrates</option>
+                        <option value="fats">Fats</option>
+                        <option value="vegetables">Vegetables</option>
+                        <option value="fruits">Fruits</option>
+                    </select>
+                </div>
+                <div class="food-list" id="food-list">
+                    <!-- Food items will be populated by JavaScript -->
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn btn-small" onclick="openCreateRecipeModal()">🧾 New Recipe</button>
+                    <button class="btn btn-secondary btn-small" onclick="openCreateMealModal()">🍽️ New Meal</button>
+                    <button class="btn btn-warning btn-small" onclick="openManageMealOptionsModal()">📝 Meal Options</button>
+                </div>
+            </div>
+            
+            <!-- Current Meal Builder -->
+            <div class="sidebar-section">
+                <h4>🔨 Meal Builder</h4>
+                <div class="form-group">
+                    <label>Meal Type</label>
+                    <select id="meal-type">
+                        <option>Breakfast</option>
+                        <option>Morning Snack</option>
+                        <option>Lunch</option>
+                        <option>Afternoon Snack</option>
+                        <option>Dinner</option>
+                    </select>
+                </div>
+                <div id="current-meal-builder" style="min-height: 100px; padding: 15px; background: rgba(26, 26, 26, 0.6); border-radius: var(--radius); margin-bottom: 15px;">
+                    <div style="color: var(--text-secondary); font-style: italic; text-align: center;">Add foods to build meal...</div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success btn-small" onclick="saveMealPlan()">💾 Save</button>
+                    <button class="btn btn-secondary btn-small" onclick="clearMealBuilder()">🗑️ Clear</button>
+                </div>
+            </div>
+            
+            <!-- Macro Targets -->
+            <div class="sidebar-section">
+                <h4>🎯 Daily Targets</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div class="form-group">
+                        <label>Calories</label>
+                        <input type="number" value="2281" id="target-calories">
+                    </div>
+                    <div class="form-group">
+                        <label>Protein (g)</label>
+                        <input type="number" value="139" id="target-protein">
+                    </div>
+                    <div class="form-group">
+                        <label>Carbs (g)</label>
+                        <input type="number" value="304" id="target-carbs">
+                    </div>
+                    <div class="form-group">
+                        <label>Fat (g)</label>
+                        <input type="number" value="65" id="target-fat">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals will be loaded from modals.js -->
+    <div id="modals-container"></div>
+
+    <!-- JavaScript Files -->
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/meals.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/modals.js"></script>
+</body>
+</html>
