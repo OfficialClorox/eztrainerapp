@@ -53,38 +53,58 @@
                     <!-- Day Navigation -->
                     <div class="day-navigation">
                         <button class="btn btn-secondary btn-small" onclick="previousDay()">‹ Previous</button>
-                        <div class="day-title" id="current-day-title">July 12, 2025</div>
+                        <div class="day-title" id="current-day-title">July 15, 2025</div>
                         <button class="btn btn-secondary btn-small" onclick="nextDay()">Next ›</button>
                     </div>
                     
-                    <!-- Macro Summary -->
+                    <!-- Macro Summary with Goal Progress -->
                     <div class="macro-summary">
                         <div class="macro-card">
                             <div class="macro-value" id="day-calories">1990</div>
                             <div class="macro-target">/ 2281 cal</div>
                             <div class="macro-difference negative">-291</div>
+                            <div style="margin-top: 8px;">
+                                <div class="progress-bar" style="height: 6px;">
+                                    <div class="progress-fill" style="width: 87%; background: var(--warning);"></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="macro-card">
                             <div class="macro-value" id="day-protein">154g</div>
                             <div class="macro-target">/ 139g</div>
                             <div class="macro-difference positive">+15g</div>
+                            <div style="margin-top: 8px;">
+                                <div class="progress-bar" style="height: 6px;">
+                                    <div class="progress-fill" style="width: 100%; background: var(--success);"></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="macro-card">
                             <div class="macro-value" id="day-carbs">163g</div>
                             <div class="macro-target">/ 304g</div>
                             <div class="macro-difference negative">-141g</div>
+                            <div style="margin-top: 8px;">
+                                <div class="progress-bar" style="height: 6px;">
+                                    <div class="progress-fill" style="width: 54%; background: var(--danger);"></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="macro-card">
                             <div class="macro-value" id="day-fat">58g</div>
                             <div class="macro-target">/ 65g</div>
                             <div class="macro-difference negative">-7g</div>
+                            <div style="margin-top: 8px;">
+                                <div class="progress-bar" style="height: 6px;">
+                                    <div class="progress-fill" style="width: 89%; background: var(--primary);"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Meal Details (Collapsible) -->
+                    <!-- Meal Details (Collapsible) with Serving Information -->
                     <div class="meals-details">
                         <div class="meal-header" onclick="toggleMealDetails('breakfast')">
-                            <h4>🌅 Breakfast - 350 cal</h4>
+                            <h4>🌅 Breakfast - 350 cal <span style="font-size: 12px; color: var(--success);">(77% of goal)</span></h4>
                             <span class="dropdown-arrow" id="breakfast-arrow">▼</span>
                         </div>
                         <div class="meal-content" id="breakfast-content">
@@ -95,10 +115,10 @@
                                          alt="Food photo">
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 600; color: var(--text-primary);">3 Eggs</span>
+                                            <span style="font-weight: 600; color: var(--text-primary);">3 × Large Eggs</span>
                                             <span style="color: var(--text-secondary);">210 cal | 18g P | 1g C | 15g F</span>
                                         </div>
-                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client</div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client • 3 servings</div>
                                     </div>
                                 </div>
                                 <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
@@ -107,17 +127,17 @@
                                     </div>
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 600; color: var(--text-primary);">2 slices whole grain bread</span>
+                                            <span style="font-weight: 600; color: var(--text-primary);">2 × Whole grain bread slices</span>
                                             <span style="color: var(--text-secondary);">140 cal | 6g P | 24g C | 2g F</span>
                                         </div>
-                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry</div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry • 2 servings</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="meal-header" onclick="toggleMealDetails('snack1')">
-                            <h4>🥤 Morning Snack - 310 cal</h4>
+                            <h4>🥤 Morning Snack - 310 cal <span style="font-size: 12px; color: var(--warning);">(90% of goal)</span></h4>
                             <span class="dropdown-arrow" id="snack1-arrow">▼</span>
                         </div>
                         <div class="meal-content" id="snack1-content">
@@ -128,17 +148,17 @@
                                          alt="Food photo">
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 600; color: var(--text-primary);">Protein shake</span>
+                                            <span style="font-weight: 600; color: var(--text-primary);">1 × Protein shake serving</span>
                                             <span style="color: var(--text-secondary);">310 cal | 25g P | 38g C | 5g F</span>
                                         </div>
-                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client</div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client • 1 serving</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="meal-header" onclick="toggleMealDetails('lunch')">
-                            <h4>☀️ Lunch - 530 cal</h4>
+                            <h4>☀️ Lunch - 530 cal <span style="font-size: 12px; color: var(--success);">(77% of goal)</span></h4>
                             <span class="dropdown-arrow" id="lunch-arrow">▼</span>
                         </div>
                         <div class="meal-content" id="lunch-content">
@@ -149,10 +169,10 @@
                                          alt="Food photo">
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 600; color: var(--text-primary);">Grilled chicken</span>
+                                            <span style="font-weight: 600; color: var(--text-primary);">1.5 × 100g Grilled chicken</span>
                                             <span style="color: var(--text-secondary);">300 cal | 40g P | 0g C | 7g F</span>
                                         </div>
-                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client</div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client • 1.5 servings</div>
                                     </div>
                                 </div>
                                 <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
@@ -161,17 +181,17 @@
                                     </div>
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 600; color: var(--text-primary);">Quinoa</span>
+                                            <span style="font-weight: 600; color: var(--text-primary);">1 × Cup cooked quinoa</span>
                                             <span style="color: var(--text-secondary);">230 cal | 5g P | 40g C | 5g F</span>
                                         </div>
-                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry</div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry • 1 serving</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="meal-header" onclick="toggleMealDetails('snack2')">
-                            <h4>🍎 Afternoon Snack - 150 cal</h4>
+                            <h4>🍎 Afternoon Snack - 150 cal <span style="font-size: 12px; color: var(--success);">(44% of goal)</span></h4>
                             <span class="dropdown-arrow" id="snack2-arrow">▼</span>
                         </div>
                         <div class="meal-content" id="snack2-content">
@@ -182,17 +202,17 @@
                                     </div>
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 600; color: var(--text-primary);">Greek yogurt</span>
+                                            <span style="font-weight: 600; color: var(--text-primary);">1 × 150g Greek yogurt</span>
                                             <span style="color: var(--text-secondary);">150 cal | 15g P | 10g C | 4g F</span>
                                         </div>
-                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry</div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry • 1 serving</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="meal-header" onclick="toggleMealDetails('dinner')">
-                            <h4>🌙 Dinner - 650 cal</h4>
+                            <h4>🌙 Dinner - 650 cal <span style="font-size: 12px; color: var(--success);">(81% of goal)</span></h4>
                             <span class="dropdown-arrow" id="dinner-arrow">▼</span>
                         </div>
                         <div class="meal-content" id="dinner-content">
@@ -203,10 +223,10 @@
                                          alt="Food photo">
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 600; color: var(--text-primary);">Salmon</span>
+                                            <span style="font-weight: 600; color: var(--text-primary);">1.2 × 100g Salmon fillet</span>
                                             <span style="color: var(--text-secondary);">400 cal | 40g P | 0g C | 20g F</span>
                                         </div>
-                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client</div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📸 Photo taken by client • 1.2 servings</div>
                                     </div>
                                 </div>
                                 <div class="meal-item" style="display: flex; align-items: center; gap: 15px;">
@@ -215,10 +235,10 @@
                                     </div>
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 600; color: var(--text-primary);">Sweet potatoes</span>
+                                            <span style="font-weight: 600; color: var(--text-primary);">1 × Medium sweet potato</span>
                                             <span style="color: var(--text-secondary);">250 cal | 5g P | 50g C | 0g F</span>
                                         </div>
-                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry</div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📝 Manual entry • 1 serving</div>
                                     </div>
                                 </div>
                             </div>
@@ -229,7 +249,7 @@
                         <button class="btn btn-success" onclick="exportData()">📊 Export</button>
                         <button class="btn btn-secondary" onclick="addMealEntry()">➕ Add Entry</button>
                         <button class="btn btn-primary" onclick="openMealOptionsModal()">🍽️ Select Meal</button>
-                        <button class="btn btn-warning" onclick="adjustTargets()">🎯 Targets</button>
+                        <button class="btn btn-warning" onclick="adjustTargets()">🎯 Goals</button>
                     </div>
                 </div>
                 
@@ -341,8 +361,8 @@
                     
                     <div style="background: rgba(0, 188, 212, 0.1); padding: 15px; border-radius: var(--radius); border-left: 4px solid var(--primary);">
                         <h4 style="color: var(--primary); margin-bottom: 8px; font-size: 14px;">📊 Coach Notes</h4>
-                        <p style="color: var(--text-primary); margin-bottom: 8px; font-size: 13px;">Sarah shows excellent consistency. Saturday's low adherence likely due to social events.</p>
-                        <p style="color: var(--text-secondary); font-size: 12px; margin: 0;"><strong>Action:</strong> Discuss weekend nutrition strategies.</p>
+                        <p style="color: var(--text-primary); margin-bottom: 8px; font-size: 13px;">Sarah shows excellent consistency with precise serving control. Saturday's low adherence likely due to social events.</p>
+                        <p style="color: var(--text-secondary); font-size: 12px; margin: 0;"><strong>Action:</strong> Discuss weekend nutrition strategies and portion planning.</p>
                     </div>
                 </div>
             </div>
@@ -364,6 +384,7 @@
                             <button class="btn btn-secondary btn-small" onclick="pasteToSelectedDays()" id="paste-btn" disabled>📄 Paste</button>
                             <button class="btn btn-danger btn-small" onclick="clearSelectedDays()" id="clear-btn" disabled>🗑️ Clear</button>
                             <button class="btn btn-success btn-small" onclick="saveCalendar()">💾 Save</button>
+                            <button class="btn btn-warning btn-small" onclick="exportCalendarData()">📊 Export</button>
                         </div>
                     </div>
                     
@@ -387,9 +408,9 @@
                     </div>
                     
                     <div style="margin-top: 20px; padding: 15px; background: rgba(0, 188, 212, 0.1); border-radius: var(--radius); border-left: 4px solid var(--primary);">
-                        <h4 style="color: var(--primary); margin-bottom: 8px;">💡 Calendar Guide</h4>
+                        <h4 style="color: var(--primary); margin-bottom: 8px;">💡 Enhanced Calendar Guide</h4>
                         <p style="color: var(--text-primary); font-size: 14px; margin: 0;">
-                            • <strong>Click & Drag:</strong> Select multiple days • <strong>Single-Click:</strong> Edit day's meals • <strong>Shift + Click:</strong> Select range • Use Copy/Paste for bulk operations
+                            • <strong>Adherence Dots:</strong> Color-coded dots show daily goal adherence • <strong>Click & Drag:</strong> Select multiple days • <strong>Single-Click:</strong> Edit day's meals with precise serving controls • <strong>Shift + Click:</strong> Select range • Use Copy/Paste for bulk operations with serving information preserved
                         </p>
                     </div>
                 </div>
@@ -404,74 +425,7 @@
             <button class="close-sidebar" onclick="closePlanningSidebar()">×</button>
         </div>
         <div class="sidebar-content">
-            <!-- Food Database Section -->
-            <div class="sidebar-section">
-                <h4>🗄️ Food Database</h4>
-                <div class="search-filters">
-                    <input type="text" class="search-input" placeholder="Search foods..." id="food-search" oninput="searchFoods(this.value)">
-                    <select class="filter-select" id="food-category" onchange="filterFoods()">
-                        <option value="">All Categories</option>
-                        <option value="protein">Proteins</option>
-                        <option value="carbs">Carbohydrates</option>
-                        <option value="fats">Fats</option>
-                        <option value="vegetables">Vegetables</option>
-                        <option value="fruits">Fruits</option>
-                    </select>
-                </div>
-                <div class="food-list" id="food-list">
-                    <!-- Food items will be populated by JavaScript -->
-                </div>
-                <div style="margin-top: 15px; display: flex; gap: 10px;">
-                    <button class="btn btn-small" onclick="openCreateRecipeModal()">🧾 New Recipe</button>
-                    <button class="btn btn-secondary btn-small" onclick="openCreateMealModal()">🍽️ New Meal</button>
-                    <button class="btn btn-warning btn-small" onclick="openManageMealOptionsModal()">📝 Meal Options</button>
-                </div>
-            </div>
-            
-            <!-- Current Meal Builder -->
-            <div class="sidebar-section">
-                <h4>🔨 Meal Builder</h4>
-                <div class="form-group">
-                    <label>Meal Type</label>
-                    <select id="meal-type">
-                        <option>Breakfast</option>
-                        <option>Morning Snack</option>
-                        <option>Lunch</option>
-                        <option>Afternoon Snack</option>
-                        <option>Dinner</option>
-                    </select>
-                </div>
-                <div id="current-meal-builder" style="min-height: 100px; padding: 15px; background: rgba(26, 26, 26, 0.6); border-radius: var(--radius); margin-bottom: 15px;">
-                    <div style="color: var(--text-secondary); font-style: italic; text-align: center;">Add foods to build meal...</div>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-success btn-small" onclick="saveMealPlan()">💾 Save</button>
-                    <button class="btn btn-secondary btn-small" onclick="clearMealBuilder()">🗑️ Clear</button>
-                </div>
-            </div>
-            
-            <!-- Macro Targets -->
-            <div class="sidebar-section">
-                <h4>🎯 Daily Targets</h4>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                    <div class="form-group">
-                        <label>Calories</label>
-                        <input type="number" value="2281" id="target-calories">
-                    </div>
-                    <div class="form-group">
-                        <label>Protein (g)</label>
-                        <input type="number" value="139" id="target-protein">
-                    </div>
-                    <div class="form-group">
-                        <label>Carbs (g)</label>
-                        <input type="number" value="304" id="target-carbs">
-                    </div>
-                    <div class="form-group">
-                        <label>Fat (g)</label>
-                        <input type="number" value="65" id="target-fat">
-                    </div>
-                </div>
-            </div>
+            <!-- Content will be populated by JavaScript -->
         </div>
     </div>
 
