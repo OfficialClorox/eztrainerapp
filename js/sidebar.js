@@ -64,30 +64,52 @@ function initializeSidebar() {
         
         <!-- Macro Targets -->
         <div class="sidebar-section">
-            <h4>🎯 Daily Targets</h4>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h4>🎯 Daily Targets</h4>
+                <button class="btn btn-small" onclick="openMacroGoalsModal()" title="Edit all macro goals" style="font-size: 11px; padding: 4px 8px;">⚙️</button>
+            </div>
+            
+            <!-- Editable Quick Goals -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
                 <div class="form-group">
-                    <label>Calories</label>
-                    <input type="number" value="2281" id="target-calories">
+                    <label style="font-size: 12px;">Calories</label>
+                    <input type="number" value="2281" id="target-calories" min="1000" max="5000" onchange="updateQuickGoals()" style="text-align: center; font-weight: 600; color: var(--primary);">
                 </div>
                 <div class="form-group">
-                    <label>Protein (g)</label>
-                    <input type="number" value="139" id="target-protein">
+                    <label style="font-size: 12px;">Protein (g)</label>
+                    <input type="number" value="139" id="target-protein" min="50" max="300" onchange="updateQuickGoals()" style="text-align: center; font-weight: 600; color: var(--success);">
                 </div>
                 <div class="form-group">
-                    <label>Carbs (g)</label>
-                    <input type="number" value="304" id="target-carbs">
+                    <label style="font-size: 12px;">Carbs (g)</label>
+                    <input type="number" value="304" id="target-carbs" min="50" max="500" onchange="updateQuickGoals()" style="text-align: center; font-weight: 600; color: var(--warning);">
                 </div>
                 <div class="form-group">
-                    <label>Fat (g)</label>
-                    <input type="number" value="65" id="target-fat">
+                    <label style="font-size: 12px;">Fat (g)</label>
+                    <input type="number" value="65" id="target-fat" min="20" max="200" onchange="updateQuickGoals()" style="text-align: center; font-weight: 600; color: var(--secondary);">
                 </div>
             </div>
-            <button class="btn btn-primary btn-small" onclick="openMacroGoalsModal()" style="width: 100%; margin-top: 10px;">⚙️ Manage Goals</button>
+            
+            <!-- Quick Actions -->
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <button class="btn btn-small" onclick="autoDistributeMealGoals()" style="flex: 1; font-size: 11px;">🔄 Distribute</button>
+                <button class="btn btn-secondary btn-small" onclick="openMacroGoalsModal()" style="font-size: 11px;">📝 Detailed</button>
+            </div>
+            
+            <!-- Current Distribution Preview -->
+            <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 6px; font-size: 11px;">
+                <div style="color: var(--text-secondary); margin-bottom: 6px; font-weight: 600;">Meal Distribution:</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; color: var(--text-muted);">
+                    <div>🌅 <span id="breakfast-preview">456 cal</span></div>
+                    <div>☀️ <span id="lunch-preview">684 cal</span></div>
+                    <div>🌙 <span id="dinner-preview">798 cal</span></div>
+                    <div>🍎 <span id="snack-preview">343 cal</span></div>
+                </div>
+            </div>
         </div>
     `;
     
     populateFoodList();
+    initializeQuickGoals();
 }
 
 // Day editing specific functions
@@ -760,4 +782,62 @@ function backToPlanning() {
     
     // Restore original sidebar content by calling the sidebar initialization
     initializeSidebar();
+}
+
+// Quick goals update function
+function updateQuickGoals() {
+    const caloriesInput = document.getElementById('target-calories');
+    const proteinInput = document.getElementById('target-protein');
+    const carbsInput = document.getElementById('target-carbs');
+    const fatInput = document.getElementById('target-fat');
+    
+    if (caloriesInput) appState.dailyGoals.calories = parseInt(caloriesInput.value) || 2281;
+    if (proteinInput) appState.dailyGoals.protein = parseInt(proteinInput.value) || 139;
+    if (carbsInput) appState.dailyGoals.carbs = parseInt(carbsInput.value) || 304;
+    if (fatInput) appState.dailyGoals.fat = parseInt(fatInput.value) || 65;
+    
+    // Update meal distribution preview
+    updateMealDistributionPreview();
+    
+    // Save goals
+    saveGoalsToStorage();
+    
+    // Update any open interfaces
+    if (appState.editingDay) {
+        updateDayEditingSidebar(appState.editingDay);
+    }
+    updateMealBuilder();
+    
+    showNotification('🎯 Daily goals updated', 'success');
+}
+
+function updateMealDistributionPreview() {
+    const previews = {
+        'breakfast-preview': appState.mealGoals.breakfast.calories,
+        'lunch-preview': appState.mealGoals.lunch.calories,
+        'dinner-preview': appState.mealGoals.dinner.calories,
+        'snack-preview': appState.mealGoals.snack.calories
+    };
+    
+    Object.entries(previews).forEach(([id, calories]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = `${calories} cal`;
+        }
+    });
+}
+
+// Initialize quick goals values from app state
+function initializeQuickGoals() {
+    const caloriesInput = document.getElementById('target-calories');
+    const proteinInput = document.getElementById('target-protein');
+    const carbsInput = document.getElementById('target-carbs');
+    const fatInput = document.getElementById('target-fat');
+    
+    if (caloriesInput) caloriesInput.value = appState.dailyGoals.calories;
+    if (proteinInput) proteinInput.value = appState.dailyGoals.protein;
+    if (carbsInput) carbsInput.value = appState.dailyGoals.carbs;
+    if (fatInput) fatInput.value = appState.dailyGoals.fat;
+    
+    updateMealDistributionPreview();
 }
