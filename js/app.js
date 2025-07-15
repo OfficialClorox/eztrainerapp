@@ -384,10 +384,10 @@ function getServingMultiplier(selectedServing, baseServing) {
     return servingMap[selectedServing] || 1;
 }
 
-function autoDistributeMealGoals() {
+function autoDistributeMealGoals(showNotification = true) {
     const daily = appState.dailyGoals;
     
-    // Distribution percentages
+    // Distribution percentages - trainers can customize these
     const distribution = {
         breakfast: 0.20,
         lunch: 0.30,
@@ -405,13 +405,119 @@ function autoDistributeMealGoals() {
         };
     });
     
-    showNotification('🎯 Meal goals auto-distributed based on daily targets!', 'success');
+    if (showNotification) {
+        showNotification('🎯 Meal goals auto-distributed based on daily targets!', 'success');
+    }
     
     // Update any open modals
     const goalModal = document.getElementById('macro-goals-modal');
     if (goalModal && goalModal.style.display === 'flex') {
         updateMacroGoalsModal();
     }
+    
+    // Save the updated goals
+    saveGoalsToStorage();
+}
+
+function saveGoalsToStorage() {
+    const goalsData = {
+        daily: appState.dailyGoals,
+        meals: appState.mealGoals,
+        lastUpdated: new Date().toISOString(),
+        client: appState.currentClient
+    };
+    
+    // Save to localStorage for persistence
+    try {
+        localStorage.setItem('clientMacroGoals', JSON.stringify(goalsData));
+    } catch (error) {
+        console.error('Error saving goals to storage:', error);
+    }
+}
+
+function loadGoalsFromStorage() {
+    try {
+        const savedGoals = localStorage.getItem('clientMacroGoals');
+        if (savedGoals) {
+            const goalsData = JSON.parse(savedGoals);
+            
+            // Verify the goals are for the current client
+            if (goalsData.client === appState.currentClient) {
+                appState.dailyGoals = goalsData.daily || appState.dailyGoals;
+                appState.mealGoals = goalsData.meals || appState.mealGoals;
+                
+                console.log('Loaded saved macro goals for', appState.currentClient);
+                return true;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading goals from storage:', error);
+    }
+    
+    return false;
+}
+
+// Enhanced goal management functions
+function getGoalAdjustmentSuggestions() {
+    const dailyMeals = appState.dayMeals;
+    const suggestions = [];
+    
+    // Analyze recent adherence patterns
+    const recentDays = Object.keys(dailyMeals)
+        .filter(day => dailyMeals[day] && dailyMeals[day].length > 0)
+        .slice(-7); // Last 7 days
+    
+    if (recentDays.length >= 3) {
+        const adherenceData = recentDays.map(day => {
+            const { adherence } = calculateDayAdherence(dailyMeals[day]);
+            return adherence;
+        });
+        
+        const avgAdherence = {
+            calories: adherenceData.reduce((sum, d) => sum + d.calories, 0) / adherenceData.length,
+            protein: adherenceData.reduce((sum, d) => sum + d.protein, 0) / adherenceData.length,
+            carbs: adherenceData.reduce((sum, d) => sum + d.carbs, 0) / adherenceData.length,
+            fat: adherenceData.reduce((sum, d) => sum + d.fat, 0) / adherenceData.length
+        };
+        
+        // Generate suggestions based on patterns
+        Object.entries(avgAdherence).forEach(([macro, avg]) => {
+            if (avg < 80) {
+                suggestions.push({
+                    type: 'increase',
+                    macro: macro,
+                    current: Math.round(avg),
+                    suggestion: `Consider increasing ${macro} goals - currently achieving ${Math.round(avg)}%`
+                });
+            } else if (avg > 120) {
+                suggestions.push({
+                    type: 'decrease',
+                    macro: macro,
+                    current: Math.round(avg),
+                    suggestion: `Consider decreasing ${macro} goals - currently achieving ${Math.round(avg)}%`
+                });
+            }
+        });
+    }
+    
+    return suggestions;
+}
+
+function applyGoalAdjustments(adjustments) {
+    adjustments.forEach(adjustment => {
+        const { macro, type, amount } = adjustment;
+        
+        if (type === 'increase') {
+            appState.dailyGoals[macro] += amount;
+        } else if (type === 'decrease') {
+            appState.dailyGoals[macro] = Math.max(0, appState.dailyGoals[macro] - amount);
+        }
+    });
+    
+    // Auto-distribute the adjusted goals
+    autoDistributeMealGoals();
+    
+    showNotification('🎯 Goals adjusted based on recent performance!', 'success');
 }
 
 function calculateMealProgress(mealType, dayMeals) {
@@ -570,7 +676,16 @@ function updateMacroGoalsModal() {
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
-    showNotification('💪 EZ Trainer loaded successfully!', 'success');
+    // Load saved goals for current client
+    const goalsLoaded = loadGoalsFromStorage();
+    
+    showNotification(
+        goalsLoaded 
+            ? '💪 EZ Trainer loaded with saved goals!' 
+            : '💪 EZ Trainer loaded with default goals!', 
+        'success'
+    );
+    
     updateDayDisplay();
     generateCalendar();
     populateFoodList();
@@ -599,4 +714,28 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize calendar UI
     updateCalendarUI();
+    
+    // Auto-save goals whenever they change
+    const goalInputs = ['daily-calories', 'daily-protein', 'daily-carbs', 'daily-fat'];
+    goalInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('change', saveGoalsToStorage);
+        }
+    });
+    
+    // Add keyboard shortcuts for trainers
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+G to open goals modal
+        if (e.ctrlKey && e.key === 'g') {
+            e.preventDefault();
+            openMacroGoalsModal();
+        }
+        
+        // Ctrl+R to auto-distribute goals
+        if (e.ctrlKey && e.key === 'r') {
+            e.preventDefault();
+            autoDistributeMealGoals();
+        }
+    });
 });
