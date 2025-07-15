@@ -4,6 +4,156 @@ function initializeModals() {
     if (!modalsContainer) return;
     
     modalsContainer.innerHTML = `
+        <!-- Macro Goals Modal -->
+        <div class="modal-overlay" id="macro-goals-modal">
+            <div class="modal" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h2 class="modal-title">🎯 Macro Goals Management</h2>
+                    <button class="close-btn" onclick="closeModal('macro-goals-modal')">×</button>
+                </div>
+                <div class="modal-content">
+                    <!-- Daily Goals Section -->
+                    <div class="goals-section">
+                        <h3>📅 Daily Goals</h3>
+                        <div class="goals-grid">
+                            <div class="form-group">
+                                <label>Daily Calories</label>
+                                <input type="number" id="daily-calories" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Daily Protein (g)</label>
+                                <input type="number" id="daily-protein" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Daily Carbs (g)</label>
+                                <input type="number" id="daily-carbs" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Daily Fat (g)</label>
+                                <input type="number" id="daily-fat" min="0">
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="autoDistributeMacros()" style="margin-top: 10px;">
+                            🔄 Auto-Distribute to Meals
+                        </button>
+                    </div>
+                    
+                    <!-- Meal Goals Section -->
+                    <div class="goals-section">
+                        <h3>🍽️ Individual Meal Goals</h3>
+                        
+                        <!-- Breakfast Goals -->
+                        <div class="meal-goals-subsection">
+                            <h4>🌅 Breakfast</h4>
+                            <div class="goals-grid">
+                                <div class="form-group">
+                                    <label>Calories</label>
+                                    <input type="number" id="breakfast-calories" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Protein (g)</label>
+                                    <input type="number" id="breakfast-protein" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Carbs (g)</label>
+                                    <input type="number" id="breakfast-carbs" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fat (g)</label>
+                                    <input type="number" id="breakfast-fat" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lunch Goals -->
+                        <div class="meal-goals-subsection">
+                            <h4>☀️ Lunch</h4>
+                            <div class="goals-grid">
+                                <div class="form-group">
+                                    <label>Calories</label>
+                                    <input type="number" id="lunch-calories" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Protein (g)</label>
+                                    <input type="number" id="lunch-protein" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Carbs (g)</label>
+                                    <input type="number" id="lunch-carbs" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fat (g)</label>
+                                    <input type="number" id="lunch-fat" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dinner Goals -->
+                        <div class="meal-goals-subsection">
+                            <h4>🌙 Dinner</h4>
+                            <div class="goals-grid">
+                                <div class="form-group">
+                                    <label>Calories</label>
+                                    <input type="number" id="dinner-calories" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Protein (g)</label>
+                                    <input type="number" id="dinner-protein" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Carbs (g)</label>
+                                    <input type="number" id="dinner-carbs" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fat (g)</label>
+                                    <input type="number" id="dinner-fat" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Snack Goals -->
+                        <div class="meal-goals-subsection">
+                            <h4>🍎 Snack</h4>
+                            <div class="goals-grid">
+                                <div class="form-group">
+                                    <label>Calories</label>
+                                    <input type="number" id="snack-calories" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Protein (g)</label>
+                                    <input type="number" id="snack-protein" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Carbs (g)</label>
+                                    <input type="number" id="snack-carbs" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fat (g)</label>
+                                    <input type="number" id="snack-fat" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Info Section -->
+                    <div style="margin-top: 25px; padding: 15px; background: rgba(0, 188, 212, 0.1); border-radius: var(--radius); border-left: 4px solid var(--primary);">
+                        <h4 style="color: var(--primary); margin-bottom: 8px; font-size: 14px;">💡 Goal Setting Tips</h4>
+                        <ul style="color: var(--text-primary); font-size: 13px; margin: 0; padding-left: 15px;">
+                            <li>Set daily goals first, then use "Auto-Distribute" for a starting point</li>
+                            <li>Adjust individual meals based on client preferences and schedule</li>
+                            <li>Progress bars will show green (good), yellow (close), and red (over) status</li>
+                            <li>Meal goals help clients make better food choices throughout the day</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="closeModal('macro-goals-modal')">Cancel</button>
+                        <button class="btn btn-success" onclick="saveMacroGoals()">💾 Save Goals</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Meal Options Modal -->
         <div class="modal-overlay" id="meal-options-modal">
             <div class="modal">
