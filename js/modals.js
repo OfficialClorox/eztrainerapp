@@ -4,7 +4,7 @@ function initializeModals() {
     if (!modalsContainer) return;
     
     modalsContainer.innerHTML = `
-        <!-- Macro Goals Modal -->
+        <!-- Macro Goals Management Modal -->
         <div class="modal-overlay" id="macro-goals-modal">
             <div class="modal" style="max-width: 800px;">
                 <div class="modal-header">
@@ -13,140 +13,148 @@ function initializeModals() {
                 </div>
                 <div class="modal-content">
                     <!-- Daily Goals Section -->
-                    <div class="goals-section">
-                        <h3>📅 Daily Goals</h3>
-                        <div class="goals-grid">
+                    <div style="background: rgba(0, 188, 212, 0.1); padding: 20px; border-radius: var(--radius); margin-bottom: 25px; border: 1px solid rgba(0, 188, 212, 0.3);">
+                        <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 18px;">📅 Daily Goals</h3>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
                             <div class="form-group">
-                                <label>Daily Calories</label>
-                                <input type="number" id="daily-calories" min="0">
+                                <label>Calories</label>
+                                <input type="number" id="daily-calories" min="1000" max="5000" onchange="updateDailyGoals()">
                             </div>
                             <div class="form-group">
-                                <label>Daily Protein (g)</label>
-                                <input type="number" id="daily-protein" min="0">
+                                <label>Protein (g)</label>
+                                <input type="number" id="daily-protein" min="50" max="300" onchange="updateDailyGoals()">
                             </div>
                             <div class="form-group">
-                                <label>Daily Carbs (g)</label>
-                                <input type="number" id="daily-carbs" min="0">
+                                <label>Carbs (g)</label>
+                                <input type="number" id="daily-carbs" min="50" max="500" onchange="updateDailyGoals()">
                             </div>
                             <div class="form-group">
-                                <label>Daily Fat (g)</label>
-                                <input type="number" id="daily-fat" min="0">
+                                <label>Fat (g)</label>
+                                <input type="number" id="daily-fat" min="20" max="200" onchange="updateDailyGoals()">
                             </div>
                         </div>
-                        <button class="btn btn-secondary btn-small" onclick="autoDistributeMacros()" style="margin-top: 10px;">
+                        <button class="btn btn-secondary btn-small" onclick="autoDistributeMealGoals()" style="margin-top: 10px;">
                             🔄 Auto-Distribute to Meals
                         </button>
                     </div>
                     
-                    <!-- Meal Goals Section -->
-                    <div class="goals-section">
-                        <h3>🍽️ Individual Meal Goals</h3>
-                        
-                        <!-- Breakfast Goals -->
-                        <div class="meal-goals-subsection">
-                            <h4>🌅 Breakfast</h4>
-                            <div class="goals-grid">
-                                <div class="form-group">
-                                    <label>Calories</label>
-                                    <input type="number" id="breakfast-calories" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Protein (g)</label>
-                                    <input type="number" id="breakfast-protein" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Carbs (g)</label>
-                                    <input type="number" id="breakfast-carbs" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Fat (g)</label>
-                                    <input type="number" id="breakfast-fat" min="0">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Lunch Goals -->
-                        <div class="meal-goals-subsection">
-                            <h4>☀️ Lunch</h4>
-                            <div class="goals-grid">
-                                <div class="form-group">
-                                    <label>Calories</label>
-                                    <input type="number" id="lunch-calories" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Protein (g)</label>
-                                    <input type="number" id="lunch-protein" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Carbs (g)</label>
-                                    <input type="number" id="lunch-carbs" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Fat (g)</label>
-                                    <input type="number" id="lunch-fat" min="0">
+                    <!-- Individual Meal Goals -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: var(--text-primary); margin-bottom: 15px; font-size: 18px;">🍽️ Individual Meal Goals</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                            <!-- Breakfast Goals -->
+                            <div style="background: rgba(26, 26, 26, 0.6); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border);">
+                                <h4 style="color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                    🌅 Breakfast
+                                </h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Calories</label>
+                                        <input type="number" id="breakfast-calories" onchange="updateMealGoals('breakfast')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Protein (g)</label>
+                                        <input type="number" id="breakfast-protein" onchange="updateMealGoals('breakfast')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Carbs (g)</label>
+                                        <input type="number" id="breakfast-carbs" onchange="updateMealGoals('breakfast')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Fat (g)</label>
+                                        <input type="number" id="breakfast-fat" onchange="updateMealGoals('breakfast')">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Dinner Goals -->
-                        <div class="meal-goals-subsection">
-                            <h4>🌙 Dinner</h4>
-                            <div class="goals-grid">
-                                <div class="form-group">
-                                    <label>Calories</label>
-                                    <input type="number" id="dinner-calories" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Protein (g)</label>
-                                    <input type="number" id="dinner-protein" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Carbs (g)</label>
-                                    <input type="number" id="dinner-carbs" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Fat (g)</label>
-                                    <input type="number" id="dinner-fat" min="0">
+                            
+                            <!-- Lunch Goals -->
+                            <div style="background: rgba(26, 26, 26, 0.6); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border);">
+                                <h4 style="color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                    ☀️ Lunch
+                                </h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Calories</label>
+                                        <input type="number" id="lunch-calories" onchange="updateMealGoals('lunch')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Protein (g)</label>
+                                        <input type="number" id="lunch-protein" onchange="updateMealGoals('lunch')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Carbs (g)</label>
+                                        <input type="number" id="lunch-carbs" onchange="updateMealGoals('lunch')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Fat (g)</label>
+                                        <input type="number" id="lunch-fat" onchange="updateMealGoals('lunch')">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Snack Goals -->
-                        <div class="meal-goals-subsection">
-                            <h4>🍎 Snack</h4>
-                            <div class="goals-grid">
-                                <div class="form-group">
-                                    <label>Calories</label>
-                                    <input type="number" id="snack-calories" min="0">
+                            
+                            <!-- Dinner Goals -->
+                            <div style="background: rgba(26, 26, 26, 0.6); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border);">
+                                <h4 style="color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                    🌙 Dinner
+                                </h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Calories</label>
+                                        <input type="number" id="dinner-calories" onchange="updateMealGoals('dinner')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Protein (g)</label>
+                                        <input type="number" id="dinner-protein" onchange="updateMealGoals('dinner')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Carbs (g)</label>
+                                        <input type="number" id="dinner-carbs" onchange="updateMealGoals('dinner')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Fat (g)</label>
+                                        <input type="number" id="dinner-fat" onchange="updateMealGoals('dinner')">
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label>Protein (g)</label>
-                                    <input type="number" id="snack-protein" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Carbs (g)</label>
-                                    <input type="number" id="snack-carbs" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Fat (g)</label>
-                                    <input type="number" id="snack-fat" min="0">
+                            </div>
+                            
+                            <!-- Snack Goals -->
+                            <div style="background: rgba(26, 26, 26, 0.6); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border);">
+                                <h4 style="color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                    🍎 Snacks
+                                </h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Calories</label>
+                                        <input type="number" id="snack-calories" onchange="updateMealGoals('snack')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Protein (g)</label>
+                                        <input type="number" id="snack-protein" onchange="updateMealGoals('snack')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Carbs (g)</label>
+                                        <input type="number" id="snack-carbs" onchange="updateMealGoals('snack')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size: 12px;">Fat (g)</label>
+                                        <input type="number" id="snack-fat" onchange="updateMealGoals('snack')">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Info Section -->
-                    <div style="margin-top: 25px; padding: 15px; background: rgba(0, 188, 212, 0.1); border-radius: var(--radius); border-left: 4px solid var(--primary);">
-                        <h4 style="color: var(--primary); margin-bottom: 8px; font-size: 14px;">💡 Goal Setting Tips</h4>
-                        <ul style="color: var(--text-primary); font-size: 13px; margin: 0; padding-left: 15px;">
-                            <li>Set daily goals first, then use "Auto-Distribute" for a starting point</li>
-                            <li>Adjust individual meals based on client preferences and schedule</li>
-                            <li>Progress bars will show green (good), yellow (close), and red (over) status</li>
-                            <li>Meal goals help clients make better food choices throughout the day</li>
+                    <!-- Goal Distribution Info -->
+                    <div style="background: rgba(255, 152, 0, 0.1); padding: 15px; border-radius: var(--radius); border-left: 4px solid var(--secondary); margin-bottom: 20px;">
+                        <h4 style="color: var(--secondary); margin-bottom: 8px; font-size: 14px;">💡 Goal Management Tips</h4>
+                        <ul style="color: var(--text-primary); font-size: 13px; margin: 0; padding-left: 20px;">
+                            <li>Use "Auto-Distribute" for standard meal planning (20% breakfast, 30% lunch, 35% dinner, 15% snacks)</li>
+                            <li>Adjust individual meal goals based on client preferences and schedules</li>
+                            <li>Goals help track meal-by-meal progress and maintain balanced nutrition</li>
                         </ul>
                     </div>
                     
-                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
                         <button class="btn btn-secondary" onclick="closeModal('macro-goals-modal')">Cancel</button>
                         <button class="btn btn-success" onclick="saveMacroGoals()">💾 Save Goals</button>
                     </div>
@@ -176,7 +184,7 @@ function initializeModals() {
                     </div>
                     <div style="margin-top: 20px; padding: 15px; background: rgba(0, 188, 212, 0.1); border-radius: var(--radius); border-left: 4px solid var(--primary);">
                         <h4 style="color: var(--primary); margin-bottom: 8px; font-size: 14px;">💡 For Clients</h4>
-                        <p style="color: var(--text-primary); font-size: 13px; margin: 0;">Select a meal option created by your trainer. These are pre-planned meals that fit your nutrition goals.</p>
+                        <p style="color: var(--text-primary); font-size: 13px; margin: 0;">Select a meal option created by your trainer. These are pre-planned meals that fit your nutrition goals with precise serving sizes.</p>
                     </div>
                 </div>
             </div>
@@ -208,7 +216,7 @@ function initializeModals() {
                     </div>
                     <div style="padding: 15px; background: rgba(255, 152, 0, 0.1); border-radius: var(--radius); border-left: 4px solid var(--secondary);">
                         <h4 style="color: var(--secondary); margin-bottom: 8px; font-size: 14px;">👨‍💼 For Trainers</h4>
-                        <p style="color: var(--text-primary); font-size: 13px; margin: 0;">Create multiple meal options for each meal type. Clients can then select from these pre-approved options when tracking their meals.</p>
+                        <p style="color: var(--text-primary); font-size: 13px; margin: 0;">Create multiple meal options for each meal type with precise serving sizes. Clients can then select from these pre-approved options when tracking their meals.</p>
                     </div>
                 </div>
             </div>
@@ -216,7 +224,7 @@ function initializeModals() {
 
         <!-- Create Meal Option Modal -->
         <div class="modal-overlay" id="create-meal-option-modal">
-            <div class="modal">
+            <div class="modal" style="max-width: 700px;">
                 <div class="modal-header">
                     <h2 class="modal-title">➕ Create Meal Option</h2>
                     <button class="close-btn" onclick="closeModal('create-meal-option-modal')">×</button>
@@ -242,7 +250,7 @@ function initializeModals() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Add Foods with Custom Serving Sizes</label>
+                        <label>Add Foods with Serving Control</label>
                         <div class="search-filters">
                             <input type="text" class="search-input" placeholder="Search foods..." id="meal-option-food-search" oninput="searchMealOptionFoods(this.value)">
                             <select class="filter-select" id="meal-option-food-category" onchange="filterMealOptionFoods()">
@@ -254,8 +262,8 @@ function initializeModals() {
                                 <option value="fruits">Fruits</option>
                             </select>
                         </div>
-                        <div class="food-list" id="meal-option-food-list" style="max-height: 300px;">
-                            <!-- Food items with serving controls will be populated -->
+                        <div class="food-list" id="meal-option-food-list" style="max-height: 200px;">
+                            <!-- Food items will be populated -->
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
@@ -268,7 +276,7 @@ function initializeModals() {
 
         <!-- Create Recipe Modal -->
         <div class="modal-overlay" id="recipe-modal">
-            <div class="modal">
+            <div class="modal" style="max-width: 700px;">
                 <div class="modal-header">
                     <h2 class="modal-title">🧾 Create Recipe</h2>
                     <button class="close-btn" onclick="closeModal('recipe-modal')">×</button>
@@ -279,52 +287,31 @@ function initializeModals() {
                         <input type="text" id="recipe-name" placeholder="e.g., Protein Pancakes">
                     </div>
                     <div class="form-group">
-                        <label>Servings</label>
-                        <input type="number" id="recipe-servings" value="1" min="1">
+                        <label>Total Servings</label>
+                        <input type="number" id="recipe-servings" value="1" min="1" max="20">
                     </div>
                     <div class="form-group">
                         <label>Add Ingredients with Precise Measurements</label>
-                        <div style="margin-bottom: 15px; padding: 15px; background: rgba(0, 188, 212, 0.1); border-radius: var(--radius); border-left: 4px solid var(--primary);">
-                            <h4 style="color: var(--primary); margin-bottom: 8px; font-size: 14px;">💡 Recipe Builder Tip</h4>
-                            <p style="color: var(--text-primary); font-size: 13px; margin: 0;">Use the enhanced food search below to add ingredients with custom serving sizes, or use the quick add method.</p>
-                        </div>
-                        
-                        <!-- Quick Add Method -->
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px; padding: 10px; background: rgba(45, 45, 45, 0.6); border-radius: var(--radius);">
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                             <input type="text" id="ingredient-search" placeholder="Search ingredient..." style="flex: 1;">
-                            <input type="number" id="ingredient-amount" placeholder="Amount" style="width: 80px;">
+                            <input type="number" id="ingredient-amount" placeholder="Amount" style="width: 80px;" step="0.1">
                             <select id="ingredient-unit" style="width: 80px;">
                                 <option>g</option>
                                 <option>oz</option>
                                 <option>cup</option>
                                 <option>tbsp</option>
                                 <option>tsp</option>
+                                <option>ml</option>
+                                <option>piece</option>
                             </select>
                             <button class="btn btn-small" onclick="addIngredient()">Add</button>
                         </div>
-                        
-                        <!-- Enhanced Food Search for Recipes -->
-                        <div class="search-filters">
-                            <input type="text" class="search-input" placeholder="Search foods for precise measurements..." id="recipe-food-search" oninput="searchRecipeFoods(this.value)">
-                            <select class="filter-select" id="recipe-food-category" onchange="filterRecipeFoods()">
-                                <option value="">All Categories</option>
-                                <option value="protein">Proteins</option>
-                                <option value="carbs">Carbohydrates</option>
-                                <option value="fats">Fats</option>
-                                <option value="vegetables">Vegetables</option>
-                                <option value="fruits">Fruits</option>
-                            </select>
-                        </div>
-                        <div class="food-list" id="recipe-food-list" style="max-height: 200px; margin-bottom: 15px;">
-                            <!-- Enhanced food items will be populated -->
-                        </div>
                     </div>
-                    
                     <div class="ingredient-list" id="recipe-ingredients">
                         <!-- Ingredients will be added here -->
                     </div>
                     <div id="recipe-totals" style="padding: 15px; background: rgba(0, 188, 212, 0.1); border-radius: var(--radius); margin-bottom: 15px;">
-                        <strong>Recipe Totals: </strong><span id="recipe-macro-totals">0 cal | 0g P | 0g C | 0g F</span>
+                        <strong>Recipe Totals (all servings): </strong><span id="recipe-macro-totals">0 cal | 0g P | 0g C | 0g F</span>
                     </div>
                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
                         <button class="btn btn-secondary" onclick="closeModal('recipe-modal')">Cancel</button>
@@ -387,169 +374,46 @@ function initializeModals() {
     });
 }
 
-// Recipe Food Search Functions
-function populateRecipeFoodList() {
-    const foodList = document.getElementById('recipe-food-list');
-    if (!foodList) return;
+// Macro Goals Management Functions
+function updateDailyGoals() {
+    const caloriesInput = document.getElementById('daily-calories');
+    const proteinInput = document.getElementById('daily-protein');
+    const carbsInput = document.getElementById('daily-carbs');
+    const fatInput = document.getElementById('daily-fat');
     
-    const foods = appState.foodDatabase;
-    
-    foodList.innerHTML = foods.map((food, index) => `
-        <div class="food-item-enhanced" data-food-index="${index}">
-            <div class="food-header">
-                <div class="food-info">
-                    <div class="food-name">${food.name}</div>
-                    <div class="food-macros">Base: ${food.calories} cal • ${food.protein}g P • ${food.carbs}g C • ${food.fat}g F (per 100g)</div>
-                </div>
-            </div>
-            <div class="serving-controls">
-                <div class="serving-inputs">
-                    <div class="serving-input-group">
-                        <label>Size:</label>
-                        <input type="number" 
-                               class="serving-size-input" 
-                               value="100" 
-                               min="1" 
-                               data-food-index="${index}"
-                               onchange="updateRecipeFoodCalculation(${index})">
-                        <select class="serving-unit-select" data-food-index="${index}" onchange="updateRecipeFoodCalculation(${index})">
-                            <option value="g">g</option>
-                            <option value="oz">oz</option>
-                            <option value="cup">cup</option>
-                            <option value="tbsp">tbsp</option>
-                            <option value="tsp">tsp</option>
-                            <option value="piece">piece</option>
-                        </select>
-                    </div>
-                    <div class="serving-input-group">
-                        <label>Amount:</label>
-                        <input type="number" 
-                               class="servings-count-input" 
-                               value="1" 
-                               min="0.1" 
-                               step="0.1" 
-                               data-food-index="${index}"
-                               onchange="updateRecipeFoodCalculation(${index})">
-                    </div>
-                </div>
-                <div class="calculated-macros" id="recipe-calculated-macros-${index}">
-                    = ${food.calories} cal • ${food.protein}g P • ${food.carbs}g C • ${food.fat}g F
-                </div>
-            </div>
-            <button class="add-food-btn" onclick="addFoodToRecipeWithServings(${index})">Add to Recipe</button>
-        </div>
-    `).join('');
-    
-    // Initialize calculations
-    setTimeout(() => {
-        foods.forEach((food, index) => {
-            updateRecipeFoodCalculation(index);
-        });
-    }, 100);
+    if (caloriesInput) appState.dailyGoals.calories = parseInt(caloriesInput.value) || 2281;
+    if (proteinInput) appState.dailyGoals.protein = parseInt(proteinInput.value) || 139;
+    if (carbsInput) appState.dailyGoals.carbs = parseInt(carbsInput.value) || 304;
+    if (fatInput) appState.dailyGoals.fat = parseInt(fatInput.value) || 65;
 }
 
-function updateRecipeFoodCalculation(foodIndex) {
-    const food = appState.foodDatabase[foodIndex];
-    const servingSizeInput = document.querySelector(`#recipe-food-list input.serving-size-input[data-food-index="${foodIndex}"]`);
-    const servingUnitSelect = document.querySelector(`#recipe-food-list select.serving-unit-select[data-food-index="${foodIndex}"]`);
-    const servingsCountInput = document.querySelector(`#recipe-food-list input.servings-count-input[data-food-index="${foodIndex}"]`);
-    const calculatedMacrosDiv = document.getElementById(`recipe-calculated-macros-${foodIndex}`);
+function updateMealGoals(mealType) {
+    const goals = {};
+    ['calories', 'protein', 'carbs', 'fat'].forEach(macro => {
+        const input = document.getElementById(`${mealType}-${macro}`);
+        if (input) {
+            goals[macro] = parseInt(input.value) || 0;
+        }
+    });
     
-    if (!servingSizeInput || !servingsCountInput || !calculatedMacrosDiv) return;
+    appState.mealGoals[mealType] = goals;
+}
+
+function saveMacroGoals() {
+    // Update all goals from form
+    updateDailyGoals();
+    ['breakfast', 'lunch', 'dinner', 'snack'].forEach(mealType => {
+        updateMealGoals(mealType);
+    });
     
-    const servingSize = parseFloat(servingSizeInput.value) || 100;
-    const servingUnit = servingUnitSelect.value;
-    const servingsCount = parseFloat(servingsCountInput.value) || 1;
+    showNotification('🎯 Macro goals saved successfully!', 'success');
+    closeModal('macro-goals-modal');
     
-    // Convert serving size to grams if needed
-    let servingSizeInGrams = servingSize;
-    switch (servingUnit) {
-        case 'oz':
-            servingSizeInGrams = servingSize * 28.35;
-            break;
-        case 'cup':
-            servingSizeInGrams = servingSize * 240;
-            break;
-        case 'tbsp':
-            servingSizeInGrams = servingSize * 15;
-            break;
-        case 'tsp':
-            servingSizeInGrams = servingSize * 5;
-            break;
-        case 'piece':
-            servingSizeInGrams = servingSize * 100;
-            break;
+    // Update any open meal builders
+    if (appState.editingDay) {
+        updateDayEditingSidebar(appState.editingDay);
     }
-    
-    // Calculate multiplier based on serving size (food database is per 100g)
-    const multiplier = (servingSizeInGrams / 100) * servingsCount;
-    
-    const calculatedCalories = Math.round(food.calories * multiplier);
-    const calculatedProtein = Math.round(food.protein * multiplier * 10) / 10;
-    const calculatedCarbs = Math.round(food.carbs * multiplier * 10) / 10;
-    const calculatedFat = Math.round(food.fat * multiplier * 10) / 10;
-    
-    calculatedMacrosDiv.innerHTML = `= ${calculatedCalories} cal • ${calculatedProtein}g P • ${calculatedCarbs}g C • ${calculatedFat}g F`;
-    
-    // Store calculated values for easy access
-    calculatedMacrosDiv.dataset.calories = calculatedCalories;
-    calculatedMacrosDiv.dataset.protein = calculatedProtein;
-    calculatedMacrosDiv.dataset.carbs = calculatedCarbs;
-    calculatedMacrosDiv.dataset.fat = calculatedFat;
-    calculatedMacrosDiv.dataset.servingSize = servingSize;
-    calculatedMacrosDiv.dataset.servingUnit = servingUnit;
-    calculatedMacrosDiv.dataset.servingsCount = servingsCount;
-}
-
-function addFoodToRecipeWithServings(foodIndex) {
-    const food = appState.foodDatabase[foodIndex];
-    const calculatedMacrosDiv = document.getElementById(`recipe-calculated-macros-${foodIndex}`);
-    
-    if (!calculatedMacrosDiv) return;
-    
-    const ingredient = {
-        name: food.name,
-        amount: calculatedMacrosDiv.dataset.servingSize || 100,
-        unit: calculatedMacrosDiv.dataset.servingUnit || 'g',
-        calories: parseFloat(calculatedMacrosDiv.dataset.calories) || food.calories,
-        protein: parseFloat(calculatedMacrosDiv.dataset.protein) || food.protein,
-        carbs: parseFloat(calculatedMacrosDiv.dataset.carbs) || food.carbs,
-        fat: parseFloat(calculatedMacrosDiv.dataset.fat) || food.fat,
-        servingsCount: parseFloat(calculatedMacrosDiv.dataset.servingsCount) || 1
-    };
-    
-    if (!appState.currentRecipe) appState.currentRecipe = [];
-    appState.currentRecipe.push(ingredient);
-    updateRecipeDisplay();
-    
-    showNotification(`Added ${ingredient.servingsCount} × ${ingredient.amount}${ingredient.unit} ${ingredient.name} to recipe`, 'success');
-}
-
-function searchRecipeFoods(query) {
-    const categorySelect = document.getElementById('recipe-food-category');
-    const category = categorySelect ? categorySelect.value : '';
-    let filteredFoods = appState.foodDatabase;
-    
-    if (query) {
-        filteredFoods = filteredFoods.filter(food => 
-            food.name.toLowerCase().includes(query.toLowerCase())
-        );
-    }
-    
-    if (category) {
-        filteredFoods = filteredFoods.filter(food => food.category === category);
-    }
-    
-    const originalDatabase = appState.foodDatabase;
-    appState.foodDatabase = filteredFoods;
-    populateRecipeFoodList();
-    appState.foodDatabase = originalDatabase;
-}
-
-function filterRecipeFoods() {
-    const searchInput = document.getElementById('recipe-food-search');
-    const query = searchInput ? searchInput.value : '';
-    searchRecipeFoods(query);
+    updateMealBuilder();
 }
 
 // Modal Functions
@@ -559,7 +423,6 @@ function openCreateRecipeModal() {
         modal.style.display = 'flex';
         appState.currentRecipe = [];
         updateRecipeDisplay();
-        populateRecipeFoodList();
     }
 }
 
