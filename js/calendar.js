@@ -1,4 +1,4 @@
-// Calendar Generation with Meal Goal Awareness
+// Calendar Generation with Goal Adherence
 function generateCalendar() {
     const grid = document.getElementById('calendar-grid');
     const calendarDays = grid.querySelectorAll('.calendar-day');
@@ -22,7 +22,7 @@ function generateCalendar() {
     
     // Add current month days
     for (let day = 1; day <= daysInMonth; day++) {
-        const isToday = day === 14 && appState.currentMonth === 7; // Today is July 14
+        const isToday = day === 15 && appState.currentMonth === 7; // Today is July 15
         const dayElement = createCalendarDay(day, appState.currentMonth, false, isToday);
         grid.appendChild(dayElement);
     }
@@ -45,11 +45,16 @@ function createCalendarDay(day, month, isOtherMonth = false, isToday = false) {
     // Get meal data for this day
     let mealsHtml = '';
     let calories = '';
-    let adherenceClass = '';
+    let adherenceIndicator = '';
     
     if (!isOtherMonth && month === 7) {
         const dayMeals = appState.dayMeals[day] || [];
+        
         if (dayMeals.length > 0) {
+            // Calculate adherence for color coding
+            const { adherence, overall } = calculateDayAdherence(dayMeals);
+            const adherenceColor = getAdherenceColor(overall);
+            
             // Group meals by type and show first few
             const mealTypes = { breakfast: [], lunch: [], dinner: [], snack: [] };
             dayMeals.forEach(meal => {
@@ -61,25 +66,19 @@ function createCalendarDay(day, month, isOtherMonth = false, isToday = false) {
             const mealEmojis = { breakfast: '🥚', lunch: '🍗', dinner: '🐟', snack: '🥤' };
             let mealItems = [];
             
+            // Show meal progress indicators
             Object.entries(mealTypes).forEach(([type, meals]) => {
                 if (meals.length > 0) {
                     const emoji = mealEmojis[type];
-                    const mealGoal = appState.mealGoals[type];
-                    const mealTotals = meals.reduce((acc, meal) => ({
-                        calories: acc.calories + meal.calories,
-                        protein: acc.protein + meal.protein,
-                        carbs: acc.carbs + meal.carbs,
-                        fat: acc.fat + meal.fat
-                    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
-                    
-                    // Calculate adherence percentage for this meal type
-                    const adherence = Math.round((mealTotals.calories / mealGoal.calories) * 100);
-                    const adherenceColor = getProgressColor(mealTotals.calories, mealGoal.calories);
+                    const mealProgress = calculateMealProgress(type, dayMeals);
+                    const avgProgress = (mealProgress.progress.calories + mealProgress.progress.protein + 
+                                       mealProgress.progress.carbs + mealProgress.progress.fat) / 4;
+                    const progressColor = getAdherenceColor(avgProgress);
                     
                     mealItems.push(`
-                        <div class="day-meal-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1px;">
+                        <div class="day-meal-item" style="display: flex; justify-content: space-between; align-items: center;">
                             <span>${emoji} ${meals[0].name}</span>
-                            <span style="color: ${adherenceColor}; font-weight: 600; font-size: 8px;">${adherence}%</span>
+                            <div style="width: 6px; height: 6px; border-radius: 50%; background: ${progressColor}; margin-left: 4px;"></div>
                         </div>
                     `);
                 }
@@ -87,72 +86,28 @@ function createCalendarDay(day, month, isOtherMonth = false, isToday = false) {
             
             mealsHtml = mealItems.slice(0, 4).join('');
             
-            // Calculate total calories and daily adherence
+            // Calculate total calories
             const totalCalories = dayMeals.reduce((sum, meal) => sum + meal.calories, 0);
-            const dailyAdherence = Math.round((totalCalories / appState.dailyGoals.calories) * 100);
-            calories = `${totalCalories} cal (${dailyAdherence}%)`;
+            calories = `${Math.round(totalCalories)} cal`;
             
-            // Set adherence class for visual indicator
-            if (dailyAdherence >= 90 && dailyAdherence <= 110) {
-                adherenceClass = 'excellent-adherence';
-            } else if (dailyAdherence >= 80 && dailyAdherence <= 120) {
-                adherenceClass = 'good-adherence';
-            } else if (dailyAdherence >= 60 && dailyAdherence <= 140) {
-                adherenceClass = 'fair-adherence';
-            } else {
-                adherenceClass = 'poor-adherence';
-            }
+            // Adherence indicator dot
+            adherenceIndicator = `<div class="adherence-indicator" style="background: ${adherenceColor}; width: 8px; height: 8px; border-radius: 50%;"></div>`;
         } else {
             mealsHtml = '<div style="color: var(--text-muted); font-style: italic; text-align: center; margin-top: 25px; font-size: 8px;">Click to plan</div>';
-            calories = '- cal (0%)';
-            adherenceClass = 'no-data';
+            calories = '- cal';
+            adherenceIndicator = '<div class="adherence-indicator" style="background: var(--border);"></div>';
         }
     }
     
     dayElement.innerHTML = `
-        <div class="day-number">${day}</div>
+        <div class="day-number">
+            <span>${day}</span>
+            ${adherenceIndicator}
+        </div>
         <div class="day-meals">${mealsHtml}</div>
-        <div class="day-calories ${adherenceClass}">${calories}</div>
-        <div class="adherence-indicator ${adherenceClass}"></div>
+        <div class="day-calories">${calories}</div>
         <div class="edit-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 188, 212, 0.1); border-radius: var(--radius); opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--primary);">✏️ Edit</div>
     `;
-    
-    // Add adherence indicator styles
-    const adherenceIndicator = dayElement.querySelector('.adherence-indicator');
-    if (adherenceIndicator) {
-        adherenceIndicator.style.cssText = `
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        `;
-        
-        switch (adherenceClass) {
-            case 'excellent-adherence':
-                adherenceIndicator.style.background = 'var(--success)';
-                adherenceIndicator.style.boxShadow = '0 0 6px rgba(76, 175, 80, 0.6)';
-                break;
-            case 'good-adherence':
-                adherenceIndicator.style.background = 'var(--primary)';
-                adherenceIndicator.style.boxShadow = '0 0 6px rgba(0, 188, 212, 0.6)';
-                break;
-            case 'fair-adherence':
-                adherenceIndicator.style.background = 'var(--warning)';
-                adherenceIndicator.style.boxShadow = '0 0 6px rgba(255, 193, 7, 0.6)';
-                break;
-            case 'poor-adherence':
-                adherenceIndicator.style.background = 'var(--danger)';
-                adherenceIndicator.style.boxShadow = '0 0 6px rgba(244, 67, 54, 0.6)';
-                break;
-            case 'no-data':
-                adherenceIndicator.style.background = 'var(--text-muted)';
-                adherenceIndicator.style.opacity = '0.3';
-                break;
-        }
-    }
     
     // Add event listeners for drag selection
     dayElement.addEventListener('mousedown', handleMouseDown);
@@ -173,13 +128,13 @@ function createCalendarDay(day, month, isOtherMonth = false, isToday = false) {
     dayElement.addEventListener('mouseenter', (e) => {
         if (!appState.isSelecting && !isOtherMonth) {
             const overlay = dayElement.querySelector('.edit-overlay');
-            overlay.style.opacity = '1';
+            if (overlay) overlay.style.opacity = '1';
         }
     });
     
     dayElement.addEventListener('mouseleave', (e) => {
         const overlay = dayElement.querySelector('.edit-overlay');
-        overlay.style.opacity = '0';
+        if (overlay) overlay.style.opacity = '0';
     });
     
     return dayElement;
@@ -289,54 +244,38 @@ function updateCalendarUI() {
     const hasCopiedData = appState.copiedMealPlan !== null;
     
     // Update button states
-    document.getElementById('copy-btn').disabled = !hasSelection;
-    document.getElementById('paste-btn').disabled = !hasSelection || !hasCopiedData;
-    document.getElementById('clear-btn').disabled = !hasSelection;
+    const copyBtn = document.getElementById('copy-btn');
+    const pasteBtn = document.getElementById('paste-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    
+    if (copyBtn) copyBtn.disabled = !hasSelection;
+    if (pasteBtn) pasteBtn.disabled = !hasSelection || !hasCopiedData;
+    if (clearBtn) clearBtn.disabled = !hasSelection;
     
     // Update selection info
     const selectionInfo = document.getElementById('selection-info');
     const selectionText = document.getElementById('selection-text');
     
-    if (hasSelection) {
+    if (hasSelection && selectionInfo && selectionText) {
         selectionInfo.style.display = 'block';
-        
-        // Calculate aggregated stats for selected days
-        let totalCalories = 0;
-        let totalMeals = 0;
-        let adherenceSum = 0;
-        let daysWithData = 0;
-        
-        appState.selectedDays.forEach(day => {
-            const dayMeals = appState.dayMeals[day] || [];
-            if (dayMeals.length > 0) {
-                const dayCalories = dayMeals.reduce((sum, meal) => sum + meal.calories, 0);
-                totalCalories += dayCalories;
-                totalMeals += dayMeals.length;
-                adherenceSum += (dayCalories / appState.dailyGoals.calories) * 100;
-                daysWithData++;
-            }
-        });
-        
-        const avgAdherence = daysWithData > 0 ? Math.round(adherenceSum / daysWithData) : 0;
         
         if (appState.selectedDays.length === 1) {
             const day = appState.selectedDays[0];
             const dayMeals = appState.dayMeals[day] || [];
-            const dayCalories = dayMeals.reduce((sum, meal) => sum + meal.calories, 0);
-            const dayAdherence = Math.round((dayCalories / appState.dailyGoals.calories) * 100);
-            
-            selectionText.innerHTML = `
-                <strong>Day ${day} Selected</strong><br>
-                ${dayMeals.length} meals • ${dayCalories} calories • ${dayAdherence}% goal adherence
-            `;
+            const { overall } = calculateDayAdherence(dayMeals);
+            selectionText.textContent = `1 day selected (Day ${day}) - ${Math.round(overall)}% adherence`;
         } else {
             const sortedDays = appState.selectedDays.sort((a, b) => a - b);
-            selectionText.innerHTML = `
-                <strong>${appState.selectedDays.length} Days Selected</strong> (Days ${sortedDays.join(', ')})<br>
-                ${totalMeals} total meals • ${totalCalories} total calories • ${avgAdherence}% avg adherence
-            `;
+            // Calculate average adherence for selected days
+            const totalAdherence = appState.selectedDays.reduce((sum, day) => {
+                const dayMeals = appState.dayMeals[day] || [];
+                const { overall } = calculateDayAdherence(dayMeals);
+                return sum + overall;
+            }, 0);
+            const avgAdherence = totalAdherence / appState.selectedDays.length;
+            selectionText.textContent = `${appState.selectedDays.length} days selected (Days ${sortedDays.join(', ')}) - ${Math.round(avgAdherence)}% avg adherence`;
         }
-    } else {
+    } else if (selectionInfo) {
         selectionInfo.style.display = 'none';
     }
 }
@@ -348,39 +287,33 @@ function copySelectedDays() {
         return;
     }
     
-    // Copy meal plans from the first selected day
-    const firstDay = Math.min(...appState.selectedDays);
+    // Copy the meal plan from the first selected day, including goal adherence
+    const firstDay = appState.selectedDays[0];
     const dayMeals = appState.dayMeals[firstDay] || [];
     
     if (dayMeals.length === 0) {
-        showNotification('Selected day has no meals to copy', 'warning');
+        showNotification('No meals to copy from selected day(s)', 'warning');
         return;
     }
     
-    // Calculate totals and adherence for the copied plan
-    const totalCalories = dayMeals.reduce((sum, meal) => sum + meal.calories, 0);
-    const totalProtein = dayMeals.reduce((sum, meal) => sum + meal.protein, 0);
-    const totalCarbs = dayMeals.reduce((sum, meal) => sum + meal.carbs, 0);
-    const totalFat = dayMeals.reduce((sum, meal) => sum + meal.fat, 0);
-    
-    const adherence = {
-        calories: Math.round((totalCalories / appState.dailyGoals.calories) * 100),
-        protein: Math.round((totalProtein / appState.dailyGoals.protein) * 100),
-        carbs: Math.round((totalCarbs / appState.dailyGoals.carbs) * 100),
-        fat: Math.round((totalFat / appState.dailyGoals.fat) * 100)
-    };
+    const { adherence, overall } = calculateDayAdherence(dayMeals);
     
     appState.copiedMealPlan = {
-        meals: dayMeals.map(meal => meal.name),
-        calories: totalCalories,
-        protein: totalProtein,
-        carbs: totalCarbs,
-        fat: totalFat,
-        adherence: adherence,
-        fullMealData: [...dayMeals]
+        meals: dayMeals.map(meal => ({
+            ...meal,
+            foods: meal.foods || []
+        })),
+        adherence: {
+            overall: Math.round(overall),
+            calories: Math.round(adherence.calories),
+            protein: Math.round(adherence.protein),
+            carbs: Math.round(adherence.carbs),
+            fat: Math.round(adherence.fat)
+        },
+        totalCalories: dayMeals.reduce((sum, meal) => sum + meal.calories, 0)
     };
     
-    showNotification(`📋 Copied meal plan from Day ${firstDay} (${totalCalories} cal, ${adherence.calories}% adherence)`, 'success');
+    showNotification(`📋 Copied meal plan from Day ${firstDay} (${Math.round(overall)}% adherence)`, 'success');
     updateCalendarUI();
 }
 
@@ -395,12 +328,16 @@ function pasteToSelectedDays() {
         return;
     }
     
-    // Apply the copied meal plan to each selected day
+    // Paste the meal plan to all selected days
     appState.selectedDays.forEach(day => {
-        appState.dayMeals[day] = [...appState.copiedMealPlan.fullMealData];
+        // Deep clone the meals to avoid reference issues
+        appState.dayMeals[day] = appState.copiedMealPlan.meals.map(meal => ({
+            ...meal,
+            foods: meal.foods ? [...meal.foods] : []
+        }));
     });
     
-    // Add visual feedback with adherence info
+    // Add visual feedback
     appState.selectedDays.forEach(day => {
         const dayElement = document.querySelector(`[data-day="${day}"][data-month="7"]:not(.other-month)`);
         if (dayElement) {
@@ -411,13 +348,11 @@ function pasteToSelectedDays() {
         }
     });
     
-    const adherence = appState.copiedMealPlan.adherence;
-    showNotification(`📄 Pasted meal plan to ${appState.selectedDays.length} day(s) (${appState.copiedMealPlan.calories} cal, ${adherence.calories}% adherence)`, 'success');
-    
-    // Refresh calendar to show updated data
+    // Regenerate calendar to show updated meals and adherence
     generateCalendar();
-    clearSelection();
-    updateCalendarUI();
+    
+    const adherence = appState.copiedMealPlan.adherence;
+    showNotification(`📄 Pasted meal plan to ${appState.selectedDays.length} day(s) (${adherence.overall}% adherence)`, 'success');
 }
 
 function clearSelectedDays() {
@@ -427,15 +362,12 @@ function clearSelectedDays() {
     }
     
     if (confirm(`Clear meals from ${appState.selectedDays.length} selected day(s)?`)) {
-        // Clear meal data for selected days
         appState.selectedDays.forEach(day => {
             appState.dayMeals[day] = [];
         });
         
-        showNotification(`🗑️ Cleared meals from ${appState.selectedDays.length} day(s)`, 'success');
-        
-        // Refresh calendar and clear selection
         generateCalendar();
+        showNotification(`🗑️ Cleared meals from ${appState.selectedDays.length} day(s)`, 'success');
         clearSelection();
         updateCalendarUI();
     }
@@ -449,14 +381,8 @@ function previousMonth() {
         appState.currentMonth--;
     }
     
-    // Update calendar header
-    const calendarTitle = document.querySelector('.calendar-nav h3');
-    if (calendarTitle) {
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                           'July', 'August', 'September', 'October', 'November', 'December'];
-        calendarTitle.textContent = `${monthNames[appState.currentMonth - 1]} ${appState.currentYear}`;
-    }
-    
+    // Update month display
+    updateMonthDisplay();
     generateCalendar();
     showNotification('📅 Moved to previous month');
 }
@@ -469,39 +395,41 @@ function nextMonth() {
         appState.currentMonth++;
     }
     
-    // Update calendar header
-    const calendarTitle = document.querySelector('.calendar-nav h3');
-    if (calendarTitle) {
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                           'July', 'August', 'September', 'October', 'November', 'December'];
-        calendarTitle.textContent = `${monthNames[appState.currentMonth - 1]} ${appState.currentYear}`;
-    }
-    
+    // Update month display
+    updateMonthDisplay();
     generateCalendar();
     showNotification('📅 Moved to next month');
 }
 
-function saveCalendar() {
-    // Calculate overall statistics for the month
-    const daysWithData = Object.keys(appState.dayMeals).filter(day => 
-        appState.dayMeals[day] && appState.dayMeals[day].length > 0
-    ).length;
+function updateMonthDisplay() {
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
     
-    let totalAdherence = 0;
-    let adherenceCount = 0;
-    
-    Object.keys(appState.dayMeals).forEach(day => {
-        const dayMeals = appState.dayMeals[day] || [];
-        if (dayMeals.length > 0) {
-            const dayCalories = dayMeals.reduce((sum, meal) => sum + meal.calories, 0);
-            totalAdherence += (dayCalories / appState.dailyGoals.calories) * 100;
-            adherenceCount++;
+    const monthDisplays = document.querySelectorAll('.calendar-header h3');
+    monthDisplays.forEach(display => {
+        if (display) {
+            display.textContent = `${monthNames[appState.currentMonth - 1]} ${appState.currentYear}`;
         }
     });
+}
+
+function saveCalendar() {
+    // Calculate overall statistics for the month
+    const daysWithMeals = Object.keys(appState.dayMeals).filter(day => 
+        appState.dayMeals[day] && appState.dayMeals[day].length > 0
+    );
     
-    const avgAdherence = adherenceCount > 0 ? Math.round(totalAdherence / adherenceCount) : 0;
+    const totalAdherence = daysWithMeals.reduce((sum, day) => {
+        const dayMeals = appState.dayMeals[day];
+        const { overall } = calculateDayAdherence(dayMeals);
+        return sum + overall;
+    }, 0);
     
-    showNotification(`💾 Calendar saved! ${daysWithData} days planned, ${avgAdherence}% avg adherence`, 'success');
+    const avgAdherence = daysWithMeals.length > 0 ? Math.round(totalAdherence / daysWithMeals.length) : 0;
+    
+    showNotification(`💾 Calendar saved! ${daysWithMeals.length} days planned (${avgAdherence}% avg adherence)`, 'success');
 }
 
 // Day Editing Functions
@@ -509,7 +437,10 @@ function editDayMeals(day) {
     appState.editingDay = day;
     openDayEditingSidebar();
     switchToEditMode(day);
-    showNotification(`📝 Editing meals for Day ${day}`, 'success');
+    
+    const dayMeals = appState.dayMeals[day] || [];
+    const { overall } = calculateDayAdherence(dayMeals);
+    showNotification(`📝 Editing meals for Day ${day} (${Math.round(overall)}% adherence)`, 'success');
 }
 
 function openDayEditingSidebar() {
@@ -520,156 +451,99 @@ function openDayEditingSidebar() {
 function switchToEditMode(day) {
     const sidebar = document.getElementById('planning-sidebar');
     const sidebarTitle = document.querySelector('.sidebar-title');
-    sidebarTitle.innerHTML = `📝 Edit Day ${day} Meals`;
+    if (sidebarTitle) {
+        sidebarTitle.innerHTML = `📝 Edit Day ${day} Meals`;
+    }
     
     // Update sidebar content to show day editing
     updateDayEditingSidebar(day);
 }
 
-function updateDayEditingSidebar(day) {
-    const sidebarContent = document.querySelector('.sidebar-content');
-    const dayMeals = appState.dayMeals[day] || [];
-    
-    // Calculate totals for the day
-    const totals = dayMeals.reduce((acc, meal) => ({
-        calories: acc.calories + meal.calories,
-        protein: acc.protein + meal.protein,
-        carbs: acc.carbs + meal.carbs,
-        fat: acc.fat + meal.fat
-    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
-    
-    // Calculate goal adherence
-    const adherence = {
-        calories: Math.round((totals.calories / appState.dailyGoals.calories) * 100),
-        protein: Math.round((totals.protein / appState.dailyGoals.protein) * 100),
-        carbs: Math.round((totals.carbs / appState.dailyGoals.carbs) * 100),
-        fat: Math.round((totals.fat / appState.dailyGoals.fat) * 100)
+// Export calendar data with goal adherence
+function exportCalendarData() {
+    const calendarData = {
+        month: appState.currentMonth,
+        year: appState.currentYear,
+        dailyGoals: appState.dailyGoals,
+        mealGoals: appState.mealGoals,
+        dayMeals: appState.dayMeals,
+        adherenceStats: {}
     };
     
-    sidebarContent.innerHTML = `
-        <!-- Day Summary -->
-        <div class="sidebar-section">
-            <h4>📊 Day ${day} Summary</h4>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
-                <div style="background: rgba(0, 188, 212, 0.1); padding: 10px; border-radius: 6px; text-align: center;">
-                    <div style="font-size: 20px; font-weight: 700; color: ${getProgressColor(totals.calories, appState.dailyGoals.calories)};">${Math.round(totals.calories)}</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Calories (${adherence.calories}%)</div>
-                </div>
-                <div style="background: rgba(76, 175, 80, 0.1); padding: 10px; border-radius: 6px; text-align: center;">
-                    <div style="font-size: 20px; font-weight: 700; color: ${getProgressColor(totals.protein, appState.dailyGoals.protein)};">${Math.round(totals.protein)}g</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Protein (${adherence.protein}%)</div>
-                </div>
-                <div style="background: rgba(255, 152, 0, 0.1); padding: 10px; border-radius: 6px; text-align: center;">
-                    <div style="font-size: 20px; font-weight: 700; color: ${getProgressColor(totals.carbs, appState.dailyGoals.carbs)};">${Math.round(totals.carbs)}g</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Carbs (${adherence.carbs}%)</div>
-                </div>
-                <div style="background: rgba(255, 193, 7, 0.1); padding: 10px; border-radius: 6px; text-align: center;">
-                    <div style="font-size: 20px; font-weight: 700; color: ${getProgressColor(totals.fat, appState.dailyGoals.fat)};">${Math.round(totals.fat)}g</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Fat (${adherence.fat}%)</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Meal Goals Overview -->
-        <div class="sidebar-section">
-            <h4>🎯 Meal Goals vs Actual</h4>
-            <div style="margin-bottom: 15px;">
-                ${generateMealGoalsComparison(day, dayMeals)}
-            </div>
-        </div>
-
-        <!-- Current Meals -->
-        <div class="sidebar-section">
-            <h4>🍽️ Current Meals</h4>
-            <div id="day-meals-list" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); background: rgba(26, 26, 26, 0.6);">
-                ${dayMeals.length > 0 ? dayMeals.map((meal, index) => {
-                    const mealEmojis = { breakfast: '🌅', lunch: '☀️', dinner: '🌙', snack: '🍎' };
-                    const mealGoal = appState.mealGoals[meal.type] || appState.mealGoals.breakfast;
-                    const mealAdherence = Math.round((meal.calories / mealGoal.calories) * 100);
-                    
-                    return `
-                        <div class="meal-item-edit" style="padding: 12px 15px; border-bottom: 1px solid var(--border);">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
-                                        ${mealEmojis[meal.type] || '🍽️'} ${meal.name}
-                                        <span style="font-size: 10px; color: ${getProgressColor(meal.calories, mealGoal.calories)}; font-weight: 700; margin-left: 8px;">
-                                            ${mealAdherence}%
-                                        </span>
-                                    </div>
-                                    <div style="font-size: 12px; color: var(--text-secondary);">
-                                        ${meal.calories} cal • ${meal.protein}g P • ${meal.carbs}g C • ${meal.fat}g F
-                                    </div>
-                                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
-                                        Goal: ${mealGoal.calories} cal • ${mealGoal.protein}g P • ${mealGoal.carbs}g C • ${mealGoal.fat}g F
-                                    </div>
-                                </div>
-                                <div style="display: flex; gap: 5px;">
-                                    <button onclick="editMealInDay(${day}, ${index})" style="background: var(--primary); color: var(--text-on-primary); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Edit</button>
-                                    <button onclick="removeMealFromDay(${day}, ${index})" style="background: var(--danger); color: var(--text-primary); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
-                                </div>
-                            </div>
-                            ${meal.foods ? `
-                                <div style="margin-left: 10px; padding-left: 10px; border-left: 2px solid var(--border);">
-                                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 5px;">Foods:</div>
-                                    ${meal.foods.map(food => `
-                                        <div style="font-size: 10px; color: var(--text-secondary); margin-bottom: 2px;">
-                                            • ${food.displayName || food.name} (${Math.round(food.calories)} cal)
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                }).join('') : '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-style: italic;">No meals added yet</div>'}
-            </div>
-            <button class="btn btn-small" onclick="showAddMealToDay(${day})" style="width: 100%; margin-top: 10px;">➕ Add New Meal</button>
-        </div>
-
-        <!-- Back to Planning -->
-        <div class="sidebar-section">
-            <button class="btn btn-secondary" onclick="backToPlanning()" style="width: 100%;">🔙 Back to Planning Mode</button>
-        </div>
-    `;
+    // Calculate adherence stats for each day
+    Object.keys(appState.dayMeals).forEach(day => {
+        const dayMeals = appState.dayMeals[day];
+        if (dayMeals && dayMeals.length > 0) {
+            const { adherence, overall } = calculateDayAdherence(dayMeals);
+            calendarData.adherenceStats[day] = {
+                overall: Math.round(overall),
+                calories: Math.round(adherence.calories),
+                protein: Math.round(adherence.protein),
+                carbs: Math.round(adherence.carbs),
+                fat: Math.round(adherence.fat)
+            };
+        }
+    });
+    
+    const jsonString = JSON.stringify(calendarData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `meal-calendar-${appState.currentYear}-${String(appState.currentMonth).padStart(2, '0')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showNotification('📊 Calendar data exported successfully!', 'success');
 }
 
-function generateMealGoalsComparison(day, dayMeals) {
-    const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
-    const mealEmojis = { breakfast: '🌅', lunch: '☀️', dinner: '🌙', snack: '🍎' };
+// Generate adherence summary report
+function generateAdherenceReport() {
+    const daysWithMeals = Object.keys(appState.dayMeals).filter(day => 
+        appState.dayMeals[day] && appState.dayMeals[day].length > 0
+    );
     
-    return mealTypes.map(mealType => {
-        const mealsOfType = dayMeals.filter(meal => meal.type === mealType);
-        const actualCalories = mealsOfType.reduce((sum, meal) => sum + meal.calories, 0);
-        const goalCalories = appState.mealGoals[mealType].calories;
-        const percentage = goalCalories > 0 ? Math.round((actualCalories / goalCalories) * 100) : 0;
-        const color = getProgressColor(actualCalories, goalCalories);
-        
-        return `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 8px; background: rgba(45, 45, 45, 0.6); border-radius: 6px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span>${mealEmojis[mealType]}</span>
-                    <span style="font-size: 12px; font-weight: 600; color: var(--text-primary); text-transform: capitalize;">${mealType}</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 11px; color: var(--text-secondary);">${actualCalories} / ${goalCalories} cal</span>
-                    <span style="font-size: 11px; font-weight: 700; color: ${color};">${percentage}%</span>
-                    <div style="width: 40px; height: 6px; background: rgba(26, 26, 26, 0.8); border-radius: 3px; overflow: hidden;">
-                        <div style="width: ${Math.min(percentage, 100)}%; height: 100%; background: ${color}; transition: width 0.3s ease;"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function backToPlanning() {
-    appState.editingDay = null;
-    appState.editingMealIndex = null;
-    appState.tempMeal = [];
+    if (daysWithMeals.length === 0) {
+        showNotification('No meal data available for report', 'warning');
+        return;
+    }
     
-    const sidebarTitle = document.querySelector('.sidebar-title');
-    sidebarTitle.innerHTML = '🍽️ Meal Planning';
+    const adherenceData = daysWithMeals.map(day => {
+        const dayMeals = appState.dayMeals[day];
+        const { adherence, overall } = calculateDayAdherence(dayMeals);
+        return {
+            day: parseInt(day),
+            overall: Math.round(overall),
+            calories: Math.round(adherence.calories),
+            protein: Math.round(adherence.protein),
+            carbs: Math.round(adherence.carbs),
+            fat: Math.round(adherence.fat)
+        };
+    });
     
-    // Restore original sidebar content by calling the sidebar initialization
-    initializeSidebar();
+    const avgAdherence = {
+        overall: Math.round(adherenceData.reduce((sum, d) => sum + d.overall, 0) / adherenceData.length),
+        calories: Math.round(adherenceData.reduce((sum, d) => sum + d.calories, 0) / adherenceData.length),
+        protein: Math.round(adherenceData.reduce((sum, d) => sum + d.protein, 0) / adherenceData.length),
+        carbs: Math.round(adherenceData.reduce((sum, d) => sum + d.carbs, 0) / adherenceData.length),
+        fat: Math.round(adherenceData.reduce((sum, d) => sum + d.fat, 0) / adherenceData.length)
+    };
+    
+    const reportData = {
+        month: `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][appState.currentMonth - 1]} ${appState.currentYear}`,
+        daysTracked: daysWithMeals.length,
+        averageAdherence: avgAdherence,
+        dailyData: adherenceData,
+        goals: {
+            daily: appState.dailyGoals,
+            meals: appState.mealGoals
+        }
+    };
+    
+    console.log('Adherence Report:', reportData);
+    showNotification(`📈 Generated adherence report for ${daysWithMeals.length} days (${avgAdherence.overall}% avg)`, 'success');
+    
+    return reportData;
 }
